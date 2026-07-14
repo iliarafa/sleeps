@@ -1,0 +1,57 @@
+import Foundation
+import SwiftData
+
+/// Identifiers shared across the app, widget, and intents.
+public enum AppIDs {
+    public static let appGroup = "group.net.csrllc.countdown"
+    public static let cloudKitContainer = "iCloud.net.csrllc.countdown"
+}
+
+/// Builds the ModelContainer that every process (app, widget, Siri intent) shares
+/// via the App Group container.
+public enum SharedStore {
+    /// The main app's container: CloudKit-synced, falling back to local-only when
+    /// CloudKit isn't available (no iCloud account, simulator without login, no
+    /// developer entitlements yet). The app stays fully functional either way.
+    public static func makeAppContainer() -> ModelContainer {
+        let schema = Schema([CountdownEvent.self])
+        do {
+            let config = ModelConfiguration(
+                schema: schema,
+                groupContainer: .identifier(AppIDs.appGroup),
+                cloudKitDatabase: .private(AppIDs.cloudKitContainer)
+            )
+            return try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            return makeLocalContainer()
+        }
+    }
+
+    /// Local-only access to the same store file. Used by the widget and Siri
+    /// extensions (they read data; sync is the app's job) and as the app's fallback.
+    public static func makeLocalContainer() -> ModelContainer {
+        let schema = Schema([CountdownEvent.self])
+        do {
+            let config = ModelConfiguration(
+                schema: schema,
+                groupContainer: .identifier(AppIDs.appGroup),
+                cloudKitDatabase: .none
+            )
+            return try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            // Last resort (e.g. missing app group in some dev setup): in-memory,
+            // so the process still runs instead of crashing.
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try! ModelContainer(for: schema, configurations: [config])
+        }
+    }
+
+    /// Fetch all events sorted soonest-first (past events at the end).
+    public static func upcomingFirst(in context: ModelContext) -> [CountdownEvent] {
+        let descriptor = FetchDescriptor<CountdownEvent>(sortBy: [SortDescriptor(\.date)])
+        let all = (try? context.fetch(descriptor)) ?? []
+        let upcoming = all.filter { !$0.isPast }
+        let past = all.filter(\.isPast).reversed()
+        return upcoming + past
+    }
+}
