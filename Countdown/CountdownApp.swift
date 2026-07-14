@@ -1,0 +1,51 @@
+import SwiftUI
+import SwiftData
+import WidgetKit
+import CountdownKit
+
+@main
+struct CountdownApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        #if DEBUG
+        seedSampleDataIfRequested()
+        #endif
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            EventListView()
+        }
+        .modelContainer(SharedStore.shared)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+        }
+    }
+}
+
+#if DEBUG
+/// Dev-only: `simctl launch ... -seedSampleData` fills an empty store with
+/// sample events so simulator runs have something to show.
+@MainActor
+private func seedSampleDataIfRequested() {
+    guard CommandLine.arguments.contains("-seedSampleData") else { return }
+    let context = ModelContext(SharedStore.shared)
+    guard ((try? context.fetchCount(FetchDescriptor<CountdownEvent>())) ?? 0) == 0 else { return }
+
+    let cal = Calendar.current
+    let samples: [(String, Int, String, String)] = [
+        ("My Birthday", 0, "🎂", "pink"),
+        ("Summer Camp", 3, "🏕️", "green"),
+        ("Trip to Greece", 18, "✈️", "blue"),
+        ("Christmas", 164, "🎄", "red"),
+    ]
+    for (title, daysAway, emoji, color) in samples {
+        let date = cal.date(byAdding: .day, value: daysAway, to: cal.startOfDay(for: .now))!
+        context.insert(CountdownEvent(title: title, date: date, emoji: emoji, colorName: color))
+    }
+    try? context.save()
+}
+#endif

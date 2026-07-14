@@ -37,6 +37,7 @@ targets:
     info:
       path: Countdown/Info.plist
       properties:
+        CFBundleDisplayName: Sleeps
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

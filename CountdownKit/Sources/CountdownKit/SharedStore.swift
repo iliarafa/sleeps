@@ -10,36 +10,54 @@ public enum AppIDs {
 /// Builds the ModelContainer that every process (app, widget, Siri intent) shares
 /// via the App Group container.
 public enum SharedStore {
+    /// Process-wide container. In the app this is CloudKit-synced; in the widget
+    /// and intent extensions (no iCloud entitlement) the CloudKit init throws and
+    /// we transparently fall back to the same local store file.
+    public static let shared = makeAppContainer()
+
+    /// Whether this process has a usable App Group container. SwiftData asserts
+    /// (doesn't throw) when the entitlement is missing, so check up front.
+    private static var hasAppGroup: Bool {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppIDs.appGroup) != nil
+    }
+
+    /// Whether an iCloud account is signed in and available to this app.
+    private static var hasICloud: Bool {
+        FileManager.default.ubiquityIdentityToken != nil
+    }
+
     /// The main app's container: CloudKit-synced, falling back to local-only when
     /// CloudKit isn't available (no iCloud account, simulator without login, no
     /// developer entitlements yet). The app stays fully functional either way.
     public static func makeAppContainer() -> ModelContainer {
-        let schema = Schema([CountdownEvent.self])
-        do {
+        if hasAppGroup && hasICloud {
+            let schema = Schema([CountdownEvent.self])
             let config = ModelConfiguration(
                 schema: schema,
                 groupContainer: .identifier(AppIDs.appGroup),
                 cloudKitDatabase: .private(AppIDs.cloudKitContainer)
             )
-            return try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            return makeLocalContainer()
+            if let container = try? ModelContainer(for: schema, configurations: [config]) {
+                return container
+            }
         }
+        return makeLocalContainer()
     }
 
     /// Local-only access to the same store file. Used by the widget and Siri
     /// extensions (they read data; sync is the app's job) and as the app's fallback.
     public static func makeLocalContainer() -> ModelContainer {
         let schema = Schema([CountdownEvent.self])
+        let group: ModelConfiguration.GroupContainer = hasAppGroup ? .identifier(AppIDs.appGroup) : .none
         do {
             let config = ModelConfiguration(
                 schema: schema,
-                groupContainer: .identifier(AppIDs.appGroup),
+                groupContainer: group,
                 cloudKitDatabase: .none
             )
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            // Last resort (e.g. missing app group in some dev setup): in-memory,
+            // Last resort (e.g. broken store file in some dev setup): in-memory,
             // so the process still runs instead of crashing.
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try! ModelContainer(for: schema, configurations: [config])
