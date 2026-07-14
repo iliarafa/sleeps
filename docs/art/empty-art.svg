@@ -1,0 +1,27 @@
+<svg width="900" height="900" xmlns="http://www.w3.org/2000/svg">
+  <!-- transparent canvas; art floats on the app's cream background -->
+
+  <!-- confetti scatter -->
+  <rect x="140" y="120" width="54" height="54" fill="#FF4B3E" stroke="#191919" stroke-width="10" transform="rotate(18 167 147)"/>
+  <circle cx="740" cy="150" r="30" fill="#2D6CDF" stroke="#191919" stroke-width="10"/>
+  <rect x="700" y="700" width="50" height="50" fill="#00A878" stroke="#191919" stroke-width="10" transform="rotate(-16 725 725)"/>
+  <circle cx="160" cy="740" r="27" fill="#FF4D8D" stroke="#191919" stroke-width="10"/>
+  <rect x="90" y="430" width="36" height="36" fill="#FFB800" stroke="#191919" stroke-width="9" transform="rotate(30 108 448)"/>
+  <circle cx="800" cy="440" r="20" fill="#FF8A00" stroke="#191919" stroke-width="9"/>
+
+  <!-- flashcard, tilted, with hard offset shadow -->
+  <g transform="rotate(-5 450 450)">
+    <rect x="262" y="212" width="410" height="510" rx="36" fill="#191919"/>
+    <rect x="240" y="190" width="410" height="510" rx="36" fill="#FFFFFF" stroke="#191919" stroke-width="12"/>
+    <!-- yellow header strip like a calendar page -->
+    <path d="M 240 226 A 36 36 0 0 1 276 190 L 614 190 A 36 36 0 0 1 650 226 L 650 300 L 240 300 Z" fill="#FFB800" stroke="#191919" stroke-width="12"/>
+    <!-- calendar rings -->
+    <circle cx="340" cy="190" r="16" fill="#FFFCF2" stroke="#191919" stroke-width="10"/>
+    <circle cx="445" cy="190" r="16" fill="#FFFCF2" stroke="#191919" stroke-width="10"/>
+    <circle cx="550" cy="190" r="16" fill="#FFFCF2" stroke="#191919" stroke-width="10"/>
+    <!-- the big question -->
+    <text x="445" y="530" text-anchor="middle" dominant-baseline="central"
+          font-family="Avenir Next, Futura, sans-serif" font-weight="900" font-size="300"
+          fill="#FFB800" stroke="#191919" stroke-width="14" paint-order="stroke">?</text>
+  </g>
+</svg>
