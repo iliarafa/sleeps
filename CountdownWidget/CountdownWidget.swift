@@ -18,17 +18,6 @@ struct CountdownWidget: Widget {
             provider: CountdownTimelineProvider()
         ) { entry in
             CountdownWidgetView(entry: entry)
-                .containerBackground(for: .widget) {
-                    if let first = entry.events.first {
-                        LinearGradient(
-                            colors: [EventColor.named(first.colorName).color, EventColor.named(first.colorName).color.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    } else {
-                        Color.blue
-                    }
-                }
         }
         .configurationDisplayName("Countdown")
         .description("How many sleeps until the fun stuff.")

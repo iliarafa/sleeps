@@ -1,29 +1,39 @@
 import SwiftUI
+import CountdownKit
 
-/// Lightweight celebratory confetti: emoji falling in a Canvas, no dependencies.
+/// Hard-edged toy confetti: outlined squares and circles tumbling down,
+/// matching the Big & Loud slab style. Canvas-only, no dependencies.
 struct ConfettiView: View {
     @State private var start = Date()
 
-    private static let pieces = ["🎉", "🎊", "⭐️", "✨", "🎈"]
+    private static let colors: [Color] = EventColor.allCases.map(\.color) + [Loud.sun]
 
     var body: some View {
         TimelineView(.animation) { timeline in
             Canvas { context, size in
                 let t = timeline.date.timeIntervalSince(start)
-                for i in 0..<50 {
+                for i in 0..<36 {
                     var rng = SeededRandom(seed: UInt64(i))
                     let x = rng.next() * size.width
-                    let speed = 60 + rng.next() * 140
+                    let speed = 60 + rng.next() * 130
                     let phase = rng.next() * 2 * .pi
                     let offset = rng.next() * (size.height + 60)
                     let y = (t * speed + offset)
                         .truncatingRemainder(dividingBy: size.height + 60) - 30
-                    let sway = sin(t * 1.5 + phase) * 24
-                    let fontSize = 14 + rng.next() * 16
-                    context.draw(
-                        Text(Self.pieces[i % Self.pieces.count]).font(.system(size: fontSize)),
-                        at: CGPoint(x: x + sway, y: y)
-                    )
+                    let sway = sin(t * 1.4 + phase) * 22
+                    let side = 8 + rng.next() * 8
+                    let spin = Angle.radians(t * (0.8 + rng.next() * 1.6) + phase)
+                    let color = Self.colors[i % Self.colors.count]
+                    let isSquare = i % 2 == 0
+
+                    context.drawLayer { layer in
+                        layer.translateBy(x: x + sway, y: y)
+                        layer.rotate(by: spin)
+                        let rect = CGRect(x: -side / 2, y: -side / 2, width: side, height: side)
+                        let path = isSquare ? Path(rect) : Path(ellipseIn: rect)
+                        layer.fill(path, with: .color(color))
+                        layer.stroke(path, with: .color(Loud.ink), lineWidth: 2)
+                    }
                 }
             }
         }

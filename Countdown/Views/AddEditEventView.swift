@@ -30,71 +30,144 @@ struct AddEditEventView: View {
         _notificationsEnabled = State(initialValue: event?.notificationsEnabled ?? true)
     }
 
+    private var canSave: Bool {
+        !title.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("What are we waiting for?") {
-                    TextField("Summer vacation, birthday…", text: $title)
-                        .font(.title3)
-                }
+        ZStack {
+            Loud.paper.ignoresSafeArea()
 
-                Section("When is it?") {
-                    DatePicker("Date", selection: $date, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                }
-
-                Section("Pick a picture") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 10) {
-                        ForEach(Self.emojis, id: \.self) { candidate in
-                            Text(candidate)
-                                .font(.system(size: 28))
-                                .frame(maxWidth: .infinity)
-                                .padding(6)
-                                .background(
-                                    candidate == emoji ? AnyShapeStyle(.tint.opacity(0.25)) : AnyShapeStyle(.clear),
-                                    in: RoundedRectangle(cornerRadius: 10)
-                                )
-                                .onTapGesture { emoji = candidate }
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    section("WHAT ARE WE WAITING FOR?") {
+                        TextField("Summer vacation, birthday…", text: $title)
+                            .font(Loud.bold(18))
+                            .foregroundStyle(Loud.ink)
+                            .padding(14)
+                            .frame(maxWidth: .infinity)
+                            .loudBox(.white, radius: 14, shadow: 4)
                     }
-                }
 
-                Section("Pick a color") {
-                    HStack(spacing: 12) {
-                        ForEach(EventColor.allCases) { option in
-                            Circle()
-                                .fill(option.color)
-                                .frame(width: 36, height: 36)
-                                .overlay {
-                                    if option.rawValue == colorName {
-                                        Image(systemName: "checkmark")
-                                            .font(.headline)
-                                            .foregroundStyle(.white)
-                                    }
+                    section("WHEN IS IT?") {
+                        DatePicker("Date", selection: $date, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
+                            .tint(EventColor.named(colorName).color)
+                            .padding(8)
+                            .loudBox(.white, radius: 14, shadow: 4)
+                    }
+
+                    section("PICK A PICTURE") {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 10) {
+                            ForEach(Self.emojis, id: \.self) { candidate in
+                                Button {
+                                    emoji = candidate
+                                } label: {
+                                    Text(candidate)
+                                        .font(.system(size: 27))
+                                        .frame(width: 44, height: 44)
+                                        .background(
+                                            Circle().fill(candidate == emoji ? Loud.sun : .clear)
+                                        )
+                                        .overlay(
+                                            Circle().strokeBorder(Loud.ink, lineWidth: candidate == emoji ? 3 : 0)
+                                        )
                                 }
-                                .onTapGesture { colorName = option.rawValue }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .padding(12)
+                        .frame(maxWidth: .infinity)
+                        .loudBox(.white, radius: 14, shadow: 4)
                     }
-                    .frame(maxWidth: .infinity)
+
+                    section("PICK A COLOR") {
+                        HStack(spacing: 12) {
+                            ForEach(EventColor.allCases) { option in
+                                Button {
+                                    colorName = option.rawValue
+                                } label: {
+                                    Circle()
+                                        .fill(option.color)
+                                        .frame(width: 38, height: 38)
+                                        .overlay(Circle().strokeBorder(Loud.ink, lineWidth: 3))
+                                        .overlay {
+                                            if option.rawValue == colorName {
+                                                Image(systemName: "checkmark")
+                                                    .font(.system(size: 15, weight: .heavy))
+                                                    .foregroundStyle(.white)
+                                            }
+                                        }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity)
+                        .loudBox(.white, radius: 14, shadow: 4)
+                    }
+
+                    Toggle(isOn: $notificationsEnabled) {
+                        Text("REMIND US AS IT GETS CLOSE")
+                            .font(Loud.heavy(13))
+                            .foregroundStyle(Loud.ink)
+                    }
+                    .tint(EventColor.green.color)
+                    .padding(14)
+                    .loudBox(.white, radius: 14, shadow: 4)
+                }
+                .padding(20)
+                .padding(.bottom, 30)
+            }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("CANCEL")
+                        .font(Loud.heavy(13))
+                        .foregroundStyle(Loud.ink)
+                        .padding(.horizontal, 14)
+                        .frame(height: 38)
+                        .background(Capsule().fill(.white))
+                        .overlay(Capsule().strokeBorder(Loud.ink, lineWidth: 3))
                 }
 
-                Section {
-                    Toggle("Remind us as it gets close", isOn: $notificationsEnabled)
+                Spacer()
+
+                Text(event == nil ? "NEW COUNTDOWN" : "EDIT")
+                    .font(Loud.heavy(15))
+                    .foregroundStyle(Loud.ink)
+
+                Spacer()
+
+                Button {
+                    save()
+                } label: {
+                    Text("SAVE")
+                        .font(Loud.heavy(13))
+                        .foregroundStyle(Loud.ink)
+                        .padding(.horizontal, 16)
+                        .frame(height: 38)
+                        .background(Capsule().fill(canSave ? Loud.sun : Loud.sun.opacity(0.35)))
+                        .overlay(Capsule().strokeBorder(Loud.ink.opacity(canSave ? 1 : 0.35), lineWidth: 3))
                 }
+                .disabled(!canSave)
             }
-            .fontDesign(.rounded)
-            .navigationTitle(event == nil ? "New Countdown" : "Edit Countdown")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
-                        .bold()
-                        .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Loud.paper)
+        }
+    }
+
+    private func section(_ label: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text(label)
+                .font(Loud.heavy(13))
+                .kerning(1.2)
+                .foregroundStyle(Loud.ink.opacity(0.55))
+            content()
         }
     }
 

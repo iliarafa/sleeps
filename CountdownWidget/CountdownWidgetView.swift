@@ -7,6 +7,12 @@ struct CountdownWidgetView: View {
     let entry: CountdownEntry
 
     var body: some View {
+        content
+            .containerBackground(for: .widget) { background }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if entry.events.isEmpty {
             emptyView
         } else {
@@ -19,69 +25,103 @@ struct CountdownWidgetView: View {
         }
     }
 
+    private var background: Color {
+        if family == .systemMedium || entry.events.isEmpty {
+            Loud.paper
+        } else {
+            EventColor.named(entry.events[0].colorName).color
+        }
+    }
+
     private var emptyView: some View {
         VStack(spacing: 6) {
             Text("🗓️").font(.title)
-            Text("Add a countdown!")
-                .font(.caption.bold())
-                .foregroundStyle(.white)
+            Text("ADD A COUNTDOWN!")
+                .font(Loud.heavy(11))
+                .foregroundStyle(Loud.ink)
         }
     }
 }
 
-private struct SmallView: View {
+func deepLink(for event: EventSnapshot) -> URL? {
+    URL(string: "sleeps://event/\(event.id.uuidString)")
+}
+
+struct SmallView: View {
     let event: EventSnapshot
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(event.emoji)
-                .font(.system(size: 32))
-            Text(CountdownText.headline(days: event.days))
-                .font(.system(size: event.days > 0 ? 40 : 22, weight: .heavy, design: .rounded))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+        VStack(spacing: 1) {
+            LoudChip(emoji: event.emoji, size: 40)
             if event.days > 0 {
-                Text(event.days == 1 ? "sleep until" : "sleeps until")
-                    .font(.caption2.bold())
-                    .opacity(0.85)
+                Text("\(event.days)")
+                    .font(Loud.heavy(event.days >= 100 ? 34 : 44))
+                    .inkShadow()
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text(event.days == 1 ? "SLEEP UNTIL" : "SLEEPS UNTIL")
+                    .font(Loud.heavy(8))
+                    .kerning(1.2)
+            } else {
+                Text("TODAY!")
+                    .font(Loud.heavy(24))
+                    .inkShadow(2)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                    .padding(.vertical, 4)
             }
-            Text(event.title)
-                .font(.caption.bold())
+            Text(event.title.uppercased())
+                .font(Loud.heavy(11))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .widgetURL(deepLink(for: event))
     }
 }
 
-private struct MediumView: View {
+struct MediumView: View {
     let events: [EventSnapshot]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(spacing: 7) {
             ForEach(events) { event in
-                HStack(spacing: 10) {
-                    Text(event.emoji)
-                        .font(.title3)
-                    Text(event.title)
-                        .font(.subheadline.bold())
-                        .lineLimit(1)
-                    Spacer()
-                    if event.days > 0 {
-                        Text("\(event.days)")
-                            .font(.system(.title3, design: .rounded, weight: .heavy))
-                        Text(event.days == 1 ? "sleep" : "sleeps")
-                            .font(.caption2.bold())
-                            .opacity(0.85)
-                    } else {
-                        Text("Today! 🎉")
-                            .font(.subheadline.bold())
-                    }
+                Link(destination: deepLink(for: event) ?? URL(string: "sleeps://")!) {
+                    row(for: event)
                 }
             }
         }
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func row(for event: EventSnapshot) -> some View {
+        HStack(spacing: 9) {
+                    LoudChip(emoji: event.emoji, size: 30)
+                    Text(event.title.uppercased())
+                        .font(Loud.heavy(12))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Spacer(minLength: 6)
+                    if event.days > 0 {
+                        Text("\(event.days)")
+                            .font(Loud.heavy(20))
+                            .foregroundStyle(.white)
+                            .inkShadow(2)
+                        Text(event.days == 1 ? "SLEEP" : "SLEEPS")
+                            .font(Loud.heavy(8))
+                            .kerning(1)
+                            .foregroundStyle(.white.opacity(0.9))
+                    } else {
+                        Text("TODAY! 🎉")
+                            .font(Loud.heavy(13))
+                            .foregroundStyle(.white)
+                    }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity)
+        .loudBox(EventColor.named(event.colorName).color, radius: 13, shadow: 3)
     }
 }

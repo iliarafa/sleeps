@@ -9,75 +9,123 @@ struct EventListView: View {
 
     @State private var showingAdd = false
     @State private var showingSettings = false
+    @State private var path = NavigationPath()
 
     private var upcoming: [CountdownEvent] { events.filter { !$0.isPast } }
     private var past: [CountdownEvent] { events.filter(\.isPast).reversed() }
 
     var body: some View {
-        NavigationStack {
-            Group {
+        NavigationStack(path: $path) {
+            ZStack {
+                Loud.paper.ignoresSafeArea()
                 if events.isEmpty {
                     emptyState
                 } else {
                     eventList
                 }
             }
-            .navigationTitle("Sleeps")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAdd = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                    }
-                }
-            }
+            .safeAreaInset(edge: .top, spacing: 0) { header }
             .sheet(isPresented: $showingAdd) {
                 AddEditEventView(event: nil)
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
+            .navigationDestination(for: CountdownEvent.self) { event in
+                EventDetailView(event: event)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
-        .fontDesign(.rounded)
+        .onOpenURL { url in
+            // sleeps://event/<uuid> — used by widget taps
+            guard url.scheme == "sleeps", url.host() == "event",
+                  let id = UUID(uuidString: url.lastPathComponent),
+                  let event = events.first(where: { $0.id == id })
+            else { return }
+            path = NavigationPath()
+            path.append(event)
+        }
         .task {
             await NotificationScheduler.rescheduleAll(events: events)
         }
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 16) {
-            Text("🗓️")
-                .font(.system(size: 72))
-            Text("Nothing to count down yet!")
-                .font(.title2.bold())
-            Text("Add something exciting —\na birthday, a trip, a holiday…")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+    private var header: some View {
+        HStack(alignment: .center) {
+            Text("SLEEPS")
+                .font(Loud.heavy(30))
+                .foregroundStyle(Loud.ink)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 1)
+                .loudBox(Loud.sun, radius: 0, shadow: 4)
+
+            Spacer()
+
+            Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 17, weight: .heavy))
+                    .foregroundStyle(Loud.ink)
+                    .frame(width: 42, height: 42)
+                    .background(Circle().fill(Loud.paper))
+                    .overlay(Circle().strokeBorder(Loud.ink, lineWidth: 3))
+                    .background(Circle().fill(Loud.ink).offset(x: 3, y: 3))
+            }
+            .accessibilityLabel("Settings")
+
             Button {
                 showingAdd = true
             } label: {
-                Label("Add a countdown", systemImage: "plus")
-                    .font(.headline)
-                    .padding(.horizontal, 8)
+                Image(systemName: "plus")
+                    .font(.system(size: 20, weight: .heavy))
+                    .foregroundStyle(Loud.ink)
+                    .frame(width: 42, height: 42)
+                    .background(Circle().fill(Loud.sun))
+                    .overlay(Circle().strokeBorder(Loud.ink, lineWidth: 3))
+                    .background(Circle().fill(Loud.ink).offset(x: 3, y: 3))
             }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
+            .accessibilityLabel("Add a countdown")
         }
-        .padding()
+        .padding(.horizontal, 18)
+        .padding(.top, 6)
+        .padding(.bottom, 14)
+        .background(Loud.paper)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 22) {
+            VStack(spacing: 8) {
+                Text("🗓️")
+                    .font(.system(size: 60))
+                Text("NOTHING TO\nCOUNT DOWN YET!")
+                    .font(Loud.heavy(22))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Loud.ink)
+                Text("Birthdays, trips, holidays…")
+                    .font(Loud.demi(14))
+                    .foregroundStyle(Loud.ink.opacity(0.6))
+            }
+            .padding(28)
+            .loudBox(.white, radius: 22)
+
+            Button {
+                showingAdd = true
+            } label: {
+                Text("ADD ONE")
+                    .font(Loud.heavy(18))
+                    .foregroundStyle(Loud.ink)
+                    .padding(.horizontal, 26)
+                    .padding(.vertical, 12)
+                    .loudBox(Loud.sun, radius: 16)
+            }
+        }
+        .padding(30)
     }
 
     private var eventList: some View {
         ScrollView {
-            LazyVStack(spacing: 14) {
+            LazyVStack(spacing: 18) {
                 ForEach(upcoming) { event in
                     NavigationLink(value: event) {
                         EventCardView(event: event)
@@ -86,11 +134,11 @@ struct EventListView: View {
                     .contextMenu { deleteButton(for: event) }
                 }
                 if !past.isEmpty {
-                    Text("Already happened")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                    Text("ALREADY HAPPENED")
+                        .font(Loud.heavy(14))
+                        .foregroundStyle(Loud.ink.opacity(0.45))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 12)
+                        .padding(.top, 14)
                     ForEach(past) { event in
                         NavigationLink(value: event) {
                             EventCardView(event: event)
@@ -101,10 +149,9 @@ struct EventListView: View {
                     }
                 }
             }
-            .padding()
-        }
-        .navigationDestination(for: CountdownEvent.self) { event in
-            EventDetailView(event: event)
+            .padding(.horizontal, 18)
+            .padding(.top, 4)
+            .padding(.bottom, 30)
         }
     }
 
@@ -125,45 +172,39 @@ struct EventListView: View {
 struct EventCardView: View {
     let event: CountdownEvent
 
+    private var days: Int { event.daysRemaining }
+
     var body: some View {
-        HStack(spacing: 14) {
-            Text(event.emoji)
-                .font(.system(size: 40))
-                .frame(width: 62, height: 62)
-                .background(.white.opacity(0.35), in: Circle())
+        HStack(spacing: 12) {
+            LoudChip(emoji: event.emoji)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(event.title)
-                    .font(.title3.bold())
+            VStack(alignment: .leading, spacing: 1) {
+                Text(event.title.uppercased())
+                    .font(Loud.heavy(16))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+                    .multilineTextAlignment(.leading)
+                Text(event.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()).uppercased())
+                    .font(Loud.demi(11))
+                    .opacity(0.9)
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(days == 0 ? "0" : "\(days)")
+                    .font(Loud.heavy(days >= 100 ? 32 : 44))
+                    .inkShadow()
                     .lineLimit(1)
-                Text(event.date, format: .dateTime.weekday(.wide).day().month(.wide))
-                    .font(.subheadline)
-                    .opacity(0.8)
+                Text(days == 0 ? "TODAY!" : (days == 1 ? "SLEEP" : "SLEEPS"))
+                    .font(Loud.heavy(9))
+                    .kerning(1.4)
             }
-
-            Spacer()
-
-            VStack(spacing: 0) {
-                Text(CountdownText.headline(days: event.daysRemaining))
-                    .font(event.daysRemaining > 0 ? .system(size: 40, weight: .heavy) : .headline.bold())
-                    .minimumScaleFactor(0.5)
-                if event.daysRemaining > 0 {
-                    Text(event.daysRemaining == 1 ? "sleep" : "sleeps")
-                        .font(.caption.bold())
-                        .opacity(0.8)
-                }
-            }
-            .frame(minWidth: 64)
         }
-        .padding(16)
         .foregroundStyle(.white)
-        .background(
-            LinearGradient(
-                colors: [EventColor.named(event.colorName).color, EventColor.named(event.colorName).color.opacity(0.7)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            in: RoundedRectangle(cornerRadius: 24)
-        )
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
+        .frame(maxWidth: .infinity)
+        .loudBox(EventColor.named(event.colorName).color)
     }
 }
