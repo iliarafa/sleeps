@@ -94,33 +94,18 @@ struct EventListView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 22) {
-            VStack(spacing: 8) {
-                Text("🗓️")
-                    .font(.system(size: 60))
-                Text("NOTHING TO\nCOUNT DOWN YET!")
-                    .font(Loud.heavy(22))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Loud.ink)
-                Text("Birthdays, trips, holidays…")
-                    .font(Loud.demi(14))
-                    .foregroundStyle(Loud.ink.opacity(0.6))
-            }
-            .padding(28)
-            .loudBox(.white, radius: 22)
-
-            Button {
-                showingAdd = true
-            } label: {
-                Text("ADD ONE")
-                    .font(Loud.heavy(18))
-                    .foregroundStyle(Loud.ink)
-                    .padding(.horizontal, 26)
-                    .padding(.vertical, 12)
-                    .loudBox(Loud.sun, radius: 16)
-            }
+        Button {
+            showingAdd = true
+        } label: {
+            Text("ADD COUNTDOWN")
+                .font(Loud.heavy(18))
+                .foregroundStyle(Loud.ink)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 14)
+                .background(Capsule().fill(Loud.sun))
+                .overlay(Capsule().strokeBorder(Loud.ink, lineWidth: 3))
+                .background(Capsule().fill(Loud.ink).offset(x: 5, y: 5))
         }
-        .padding(30)
     }
 
     private var eventList: some View {
