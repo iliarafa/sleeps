@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "CountdownKit", targets: ["CountdownKit"])
     ],
     targets: [
-        .target(name: "CountdownKit"),
+        .target(name: "CountdownKit", resources: [.process("Resources")]),
         .testTarget(name: "CountdownKitTests", dependencies: ["CountdownKit"])
     ]
 )

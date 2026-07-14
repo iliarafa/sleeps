@@ -30,6 +30,12 @@ public final class CountdownEvent {
 }
 
 public extension CountdownEvent {
+    /// The event's picture. The stored `emoji` field holds an `EventIcon`
+    /// rawValue for new events, or a literal emoji from pre-icon builds.
+    var icon: EventIcon {
+        EventIcon.from(stored: emoji)
+    }
+
     /// Calendar days from now until the event (0 = today, negative = past).
     var daysRemaining: Int {
         DaysUntil.days(to: date)

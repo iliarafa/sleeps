@@ -52,7 +52,7 @@ enum NotificationScheduler {
             .flatMap { event in
                 NotificationPlanner.plan(
                     eventID: event.id,
-                    title: "\(event.emoji) \(event.title)",
+                    title: event.title,
                     eventDate: event.date,
                     hour: minutes / 60,
                     minute: minutes % 60

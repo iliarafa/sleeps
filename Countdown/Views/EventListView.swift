@@ -161,7 +161,7 @@ struct EventCardView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            LoudChip(emoji: event.emoji)
+            LoudChip(icon: event.icon)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(event.title.uppercased())

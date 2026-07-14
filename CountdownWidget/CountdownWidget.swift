@@ -29,7 +29,7 @@ struct CountdownWidget: Widget {
 struct EventSnapshot: Identifiable {
     let id: UUID
     let title: String
-    let emoji: String
+    let icon: EventIcon
     let colorName: String
     let days: Int
 }
@@ -42,7 +42,7 @@ struct CountdownEntry: TimelineEntry {
 struct CountdownTimelineProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> CountdownEntry {
         CountdownEntry(date: .now, events: [
-            EventSnapshot(id: UUID(), title: "Summer Vacation", emoji: "🏖️", colorName: "blue", days: 12)
+            EventSnapshot(id: UUID(), title: "Summer Vacation", icon: .beach, colorName: "blue", days: 12)
         ])
     }
 
@@ -76,7 +76,7 @@ struct CountdownTimelineProvider: AppIntentTimelineProvider {
             EventSnapshot(
                 id: event.id,
                 title: event.title,
-                emoji: event.emoji,
+                icon: event.icon,
                 colorName: event.colorName,
                 days: DaysUntil.days(from: date, to: event.date)
             )

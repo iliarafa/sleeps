@@ -32,19 +32,21 @@ public extension View {
     }
 }
 
-/// White outlined circle holding an emoji.
+/// White outlined circle holding an event icon.
 public struct LoudChip: View {
-    let emoji: String
+    let icon: EventIcon
     let size: CGFloat
 
-    public init(emoji: String, size: CGFloat = 48) {
-        self.emoji = emoji
+    public init(icon: EventIcon, size: CGFloat = 48) {
+        self.icon = icon
         self.size = size
     }
 
     public var body: some View {
-        Text(emoji)
-            .font(.system(size: size * 0.52))
+        icon.image
+            .resizable()
+            .scaledToFit()
+            .frame(width: size * 0.66, height: size * 0.66)
             .frame(width: size, height: size)
             .background(Circle().fill(Loud.paper))
             .overlay(Circle().strokeBorder(Loud.ink, lineWidth: 3))

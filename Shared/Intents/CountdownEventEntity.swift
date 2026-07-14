@@ -10,12 +10,12 @@ struct CountdownEventEntity: AppEntity {
 
     let id: UUID
     let title: String
-    let emoji: String
+    let icon: EventIcon
     let date: Date
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
-            title: "\(emoji) \(title)",
+            title: "\(title)",
             subtitle: "\(CountdownText.sleeps(days: DaysUntil.days(to: date)))"
         )
     }
@@ -23,7 +23,7 @@ struct CountdownEventEntity: AppEntity {
     init(event: CountdownEvent) {
         self.id = event.id
         self.title = event.title
-        self.emoji = event.emoji
+        self.icon = event.icon
         self.date = event.date
     }
 }

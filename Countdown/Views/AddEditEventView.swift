@@ -11,21 +11,15 @@ struct AddEditEventView: View {
 
     @State private var title: String
     @State private var date: Date
-    @State private var emoji: String
+    @State private var icon: EventIcon
     @State private var colorName: String
     @State private var notificationsEnabled: Bool
-
-    private static let emojis = [
-        "🎉", "🎂", "🎄", "🎃", "🎁", "✈️", "🏖️", "⛱️",
-        "⚽️", "🎢", "🏕️", "🎬", "🎠", "🚗", "🎓", "🎪",
-        "🐶", "🐱", "🏊", "⛷️", "🚀", "⭐️", "❤️", "🏠",
-    ]
 
     init(event: CountdownEvent?) {
         self.event = event
         _title = State(initialValue: event?.title ?? "")
         _date = State(initialValue: event?.date ?? Calendar.current.date(byAdding: .day, value: 7, to: .now)!)
-        _emoji = State(initialValue: event?.emoji ?? "🎉")
+        _icon = State(initialValue: event?.icon ?? .party)
         _colorName = State(initialValue: event?.colorName ?? "blue")
         _notificationsEnabled = State(initialValue: event?.notificationsEnabled ?? true)
     }
@@ -59,18 +53,20 @@ struct AddEditEventView: View {
 
                     section("PICK A PICTURE") {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 10) {
-                            ForEach(Self.emojis, id: \.self) { candidate in
+                            ForEach(EventIcon.allCases) { candidate in
                                 Button {
-                                    emoji = candidate
+                                    icon = candidate
                                 } label: {
-                                    Text(candidate)
-                                        .font(.system(size: 27))
+                                    candidate.image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 30, height: 30)
                                         .frame(width: 44, height: 44)
                                         .background(
-                                            Circle().fill(candidate == emoji ? Loud.sun : .clear)
+                                            Circle().fill(candidate == icon ? Loud.sun : .clear)
                                         )
                                         .overlay(
-                                            Circle().strokeBorder(Loud.ink, lineWidth: candidate == emoji ? 3 : 0)
+                                            Circle().strokeBorder(Loud.ink, lineWidth: candidate == icon ? 3 : 0)
                                         )
                                 }
                                 .buttonStyle(.plain)
@@ -176,11 +172,11 @@ struct AddEditEventView: View {
         if let event {
             event.title = trimmed
             event.date = date
-            event.emoji = emoji
+            event.emoji = icon.rawValue
             event.colorName = colorName
             event.notificationsEnabled = notificationsEnabled
         } else {
-            let new = CountdownEvent(title: trimmed, date: date, emoji: emoji, colorName: colorName)
+            let new = CountdownEvent(title: trimmed, date: date, emoji: icon.rawValue, colorName: colorName)
             new.notificationsEnabled = notificationsEnabled
             modelContext.insert(new)
         }

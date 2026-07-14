@@ -37,10 +37,10 @@ private func seedSampleDataIfRequested() {
 
     let cal = Calendar.current
     let samples: [(String, Int, String, String)] = [
-        ("My Birthday", 0, "🎂", "pink"),
-        ("Summer Camp", 3, "🏕️", "green"),
-        ("Trip to Greece", 18, "✈️", "blue"),
-        ("Christmas", 164, "🎄", "red"),
+        ("My Birthday", 0, EventIcon.cake.rawValue, "pink"),
+        ("Summer Camp", 3, EventIcon.tent.rawValue, "green"),
+        ("Trip to Greece", 18, EventIcon.plane.rawValue, "blue"),
+        ("Christmas", 164, EventIcon.tree.rawValue, "red"),
     ]
     for (title, daysAway, emoji, color) in samples {
         let date = cal.date(byAdding: .day, value: daysAway, to: cal.startOfDay(for: .now))!

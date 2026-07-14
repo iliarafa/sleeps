@@ -18,8 +18,10 @@ struct EventDetailView: View {
 
                 // The banner card
                 VStack(spacing: 2) {
-                    Text(event.emoji)
-                        .font(.system(size: 46))
+                    event.icon.image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 56, height: 56)
                     Text(event.title.uppercased())
                         .font(Loud.heavy(20))
                         .multilineTextAlignment(.center)

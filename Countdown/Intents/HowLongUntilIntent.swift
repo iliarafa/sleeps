@@ -15,20 +15,22 @@ struct HowLongUntilIntent: AppIntent {
         let days = DaysUntil.days(to: event.date)
         let dialog = IntentDialog(stringLiteral: CountdownText.spoken(days: days, title: event.title))
         return .result(dialog: dialog) {
-            HowLongSnippetView(emoji: event.emoji, title: event.title, days: days)
+            HowLongSnippetView(icon: event.icon, title: event.title, days: days)
         }
     }
 }
 
 private struct HowLongSnippetView: View {
-    let emoji: String
+    let icon: EventIcon
     let title: String
     let days: Int
 
     var body: some View {
         HStack(spacing: 14) {
-            Text(emoji)
-                .font(.system(size: 44))
+            icon.image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.headline)

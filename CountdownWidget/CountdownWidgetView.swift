@@ -52,7 +52,7 @@ struct SmallView: View {
 
     var body: some View {
         VStack(spacing: 1) {
-            LoudChip(emoji: event.emoji, size: 40)
+            LoudChip(icon: event.icon, size: 40)
             if event.days > 0 {
                 Text("\(event.days)")
                     .font(Loud.heavy(event.days >= 100 ? 34 : 44))
@@ -97,7 +97,7 @@ struct MediumView: View {
 
     private func row(for event: EventSnapshot) -> some View {
         HStack(spacing: 9) {
-                    LoudChip(emoji: event.emoji, size: 30)
+                    LoudChip(icon: event.icon, size: 30)
                     Text(event.title.uppercased())
                         .font(Loud.heavy(12))
                         .foregroundStyle(.white)
