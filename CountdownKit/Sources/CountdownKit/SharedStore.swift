@@ -3,8 +3,8 @@ import SwiftData
 
 /// Identifiers shared across the app, widget, and intents.
 public enum AppIDs {
-    public static let appGroup = "group.net.csrllc.countdown"
-    public static let cloudKitContainer = "iCloud.net.csrllc.countdown"
+    public static let appGroup = "group.com.iamilias.sleeps"
+    public static let cloudKitContainer = "iCloud.com.iamilias.sleeps"
 }
 
 /// Builds the ModelContainer that every process (app, widget, Siri intent) shares

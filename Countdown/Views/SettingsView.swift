@@ -9,7 +9,7 @@ struct SettingsView: View {
     @State private var notificationTime = NotificationPrefs.time
     @State private var gate: ParentalGate?
 
-    private static let privacyPolicyURL = URL(string: "https://csrllc.net/sleeps/privacy")!
+    private static let privacyPolicyURL = URL(string: "https://iamilias.github.io/sleeps/privacy")!
 
     var body: some View {
         ZStack {

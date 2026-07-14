@@ -16,7 +16,7 @@ Inspired by the user's son, who asks Siri every day "how long until August?", "h
 
 - Xcode 16+ installed
 - Apple Developer Program membership (needed for CloudKit, App Groups, and App Store publishing)
-- An app name decision — working title **"Sleeps"** or **"How Long Until"** (placeholder bundle id `net.csrllc.countdown`; easy to rename before submission)
+- An app name decision — working title **"Sleeps"** or **"How Long Until"** (placeholder bundle id `com.iamilias.sleeps`; easy to rename before submission)
 
 ## Architecture
 
@@ -29,8 +29,8 @@ Countdown.xcodeproj
 └── CountdownKit         (shared: SwiftData model, date math, formatting, App Intents)
 ```
 
-- **App Group** (`group.net.csrllc.countdown`) so the widget and Siri intents read the same SwiftData store as the app.
-- **CloudKit container** (`iCloud.net.csrllc.countdown`) with SwiftData's `cloudKitDatabase: .automatic` for private-database sync.
+- **App Group** (`group.com.iamilias.sleeps`) so the widget and Siri intents read the same SwiftData store as the app.
+- **CloudKit container** (`iCloud.com.iamilias.sleeps`) with SwiftData's `cloudKitDatabase: .automatic` for private-database sync.
 
 ### Data model (SwiftData)
 

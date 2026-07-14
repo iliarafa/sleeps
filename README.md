@@ -36,7 +36,7 @@ Dev sample data: launch with `-seedSampleData` (DEBUG only, only fills an empty 
 ## Before App Store submission (office checklist)
 
 1. Set `DEVELOPMENT_TEAM` in `project.yml` (or Xcode Signing & Capabilities) — needed for App Groups + CloudKit on device.
-2. Register the App Group `group.net.csrllc.countdown` and CloudKit container `iCloud.net.csrllc.countdown` in the developer portal (Xcode automatic signing does this for you).
+2. Register the App Group `group.com.iamilias.sleeps` and CloudKit container `iCloud.com.iamilias.sleeps` in the developer portal (Xcode automatic signing does this for you).
 3. Decide the final app name (Siri phrases include it — short wins: "…in **Sleeps**"). Rename bundle id if desired before first upload.
 4. App icon (1024×1024) into `Countdown/Assets.xcassets/AppIcon.appiconset`.
 5. Host the privacy policy and update the URL in `SettingsView.swift`.
