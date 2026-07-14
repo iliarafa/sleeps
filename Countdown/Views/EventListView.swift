@@ -93,19 +93,20 @@ struct EventListView: View {
         .background(Loud.paper)
     }
 
+    /// Placeholder art: ghost slabs sketching where countdowns will appear.
+    /// Purely decorative — the header "+" is the way to add.
     private var emptyState: some View {
-        Button {
-            showingAdd = true
-        } label: {
-            Text("ADD COUNTDOWN")
-                .font(Loud.heavy(18))
-                .foregroundStyle(Loud.ink)
-                .padding(.horizontal, 28)
-                .padding(.vertical, 14)
-                .background(Capsule().fill(Loud.sun))
-                .overlay(Capsule().strokeBorder(Loud.ink, lineWidth: 3))
-                .background(Capsule().fill(Loud.ink).offset(x: 5, y: 5))
+        VStack(spacing: 18) {
+            ForEach(0..<3, id: \.self) { index in
+                GhostCardView()
+                    .opacity(1.0 - Double(index) * 0.3)
+            }
+            Spacer()
         }
+        .padding(.horizontal, 18)
+        .padding(.top, 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .allowsHitTesting(false)
     }
 
     private var eventList: some View {
@@ -151,6 +152,39 @@ struct EventListView: View {
         } label: {
             Label("Delete", systemImage: "trash")
         }
+    }
+}
+
+/// A dashed-outline sketch of an event card, matching EventCardView's proportions.
+struct GhostCardView: View {
+    private let dash = StrokeStyle(lineWidth: 3, dash: [10, 8])
+    private var ghostInk: Color { Loud.ink.opacity(0.22) }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .strokeBorder(ghostInk, style: dash)
+                .frame(width: 48, height: 48)
+
+            VStack(alignment: .leading, spacing: 7) {
+                Capsule().fill(ghostInk.opacity(0.55))
+                    .frame(width: 120, height: 12)
+                Capsule().fill(ghostInk.opacity(0.35))
+                    .frame(width: 76, height: 8)
+            }
+
+            Spacer()
+
+            Circle()
+                .strokeBorder(ghostInk, style: dash)
+                .frame(width: 54, height: 54)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(ghostInk, style: dash)
+        )
     }
 }
 
