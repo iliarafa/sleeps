@@ -9,7 +9,8 @@ struct SettingsView: View {
     @State private var notificationTime = NotificationPrefs.time
     @State private var gate: ParentalGate?
 
-    private static let privacyPolicyURL = URL(string: "https://iamilias.github.io/sleeps/privacy")!
+    private static let privacyPolicyURL = URL(string: "https://iliarafa.github.io/sleeps/privacy.html")!
+    private static let supportURL = URL(string: "https://iliarafa.github.io/sleeps/support.html")!
 
     var body: some View {
         ZStack {
@@ -45,23 +46,8 @@ struct SettingsView: View {
                             .font(Loud.heavy(13))
                             .kerning(1.2)
                             .foregroundStyle(Loud.ink.opacity(0.55))
-                        Button {
-                            gate = ParentalGate {
-                                UIApplication.shared.open(Self.privacyPolicyURL)
-                            }
-                        } label: {
-                            HStack {
-                                Text("PRIVACY POLICY")
-                                    .font(Loud.heavy(13))
-                                Spacer()
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 13, weight: .heavy))
-                            }
-                            .foregroundStyle(Loud.ink)
-                            .padding(14)
-                            .loudBox(.white, radius: 14, shadow: 4)
-                        }
-                        .buttonStyle(.plain)
+                        grownUpLink("SUPPORT", url: Self.supportURL)
+                        grownUpLink("PRIVACY POLICY", url: Self.privacyPolicyURL)
                     }
 
                     HStack {
@@ -108,6 +94,25 @@ struct SettingsView: View {
         .sheet(item: $gate) { gate in
             ParentalGateView(gate: gate)
         }
+    }
+
+    /// A "for grown-ups" row that opens an external link only after the parental gate.
+    private func grownUpLink(_ label: String, url: URL) -> some View {
+        Button {
+            gate = ParentalGate { UIApplication.shared.open(url) }
+        } label: {
+            HStack {
+                Text(label)
+                    .font(Loud.heavy(13))
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 13, weight: .heavy))
+            }
+            .foregroundStyle(Loud.ink)
+            .padding(14)
+            .loudBox(.white, radius: 14, shadow: 4)
+        }
+        .buttonStyle(.plain)
     }
 }
 

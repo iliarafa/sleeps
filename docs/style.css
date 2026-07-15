@@ -1,0 +1,270 @@
+/* Sleeps — Big & Loud website styles (matches the iOS app) */
+
+:root {
+  --cream: #FFFCF2;
+  --ink: #191919;
+  --sun: #FFB800;
+  --red: #FF4B3E;
+  --blue: #2D6CDF;
+  --green: #00A878;
+  --pink: #FF4D8D;
+  --purple: #7048E8;
+
+  --display: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 500;
+  line-height: 1.6;
+  font-size: 18px;
+  /* subtle paper dot texture, like the app's cream ground */
+  background-image: radial-gradient(rgba(25, 25, 25, 0.035) 1.5px, transparent 1.6px);
+  background-size: 26px 26px;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 22px 96px;
+}
+
+/* ---- top bar ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.brand img {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  border: 3px solid var(--ink);
+}
+.brand .banner {
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--sun);
+  padding: 2px 12px;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+nav { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---- pill links / buttons ---- */
+.pill {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: #fff;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+.pill:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+.pill:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+.pill.sun { background: var(--sun); }
+
+/* ---- hero flashcard ---- */
+.hero {
+  border-radius: 26px;
+  border: 4px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+  padding: 40px 28px 34px;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #fff;
+}
+.hero.green { background: var(--green); }
+.hero.blue  { background: var(--blue); }
+
+.hero .emoji { font-size: 46px; line-height: 1; }
+.hero-num {
+  font-weight: 800;
+  font-size: clamp(120px, 34vw, 190px);
+  line-height: 0.9;
+  color: #fff;
+  text-shadow: 7px 7px 0 var(--ink);
+  margin: 6px 0 4px;
+}
+.hero-label {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 15px;
+  opacity: 0.95;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.hero h1 {
+  font-weight: 800;
+  font-size: clamp(30px, 7vw, 44px);
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin: 0 0 10px;
+  text-wrap: balance;
+  text-shadow: 3px 3px 0 var(--ink);
+}
+.hero p { margin: 0 auto; max-width: 42ch; font-weight: 600; opacity: 0.96; }
+
+/* ---- section eyebrow ---- */
+.eyebrow {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 14px;
+  color: rgba(25, 25, 25, 0.5);
+  margin: 40px 0 14px;
+}
+
+/* ---- slab cards ---- */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  border: 3px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+.card h2 {
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  letter-spacing: 0.01em;
+}
+.card h3 {
+  font-weight: 800;
+  font-size: 17px;
+  margin: 0 0 4px;
+}
+.card p { margin: 0 0 10px; }
+.card p:last-child { margin-bottom: 0; }
+.card ul { margin: 0; padding-left: 22px; }
+.card li { margin: 4px 0; }
+.card a { color: var(--blue); font-weight: 700; }
+
+/* color tab down the left of a card */
+.card.tab { position: relative; padding-left: 30px; }
+.card.tab::before {
+  content: "";
+  position: absolute;
+  left: 12px; top: 22px; bottom: 22px;
+  width: 7px; border-radius: 4px;
+  background: var(--accent, var(--sun));
+}
+.card.red    { --accent: var(--red); }
+.card.blue   { --accent: var(--blue); }
+.card.green  { --accent: var(--green); }
+.card.pink   { --accent: var(--pink); }
+.card.purple { --accent: var(--purple); }
+.card.sun    { --accent: var(--sun); }
+
+/* number chip for FAQ / how-to steps */
+.qrow { display: flex; gap: 16px; align-items: flex-start; }
+.qnum {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 20px; color: var(--ink);
+  background: var(--sun);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* inline "keys" for UI elements the user taps */
+kbd {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 0.85em;
+  background: var(--sun);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+/* callout for the big honest statement */
+.callout {
+  background: var(--sun);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 20px 24px;
+  font-weight: 800;
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+
+/* mail button */
+.mail {
+  display: inline-block;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--sun);
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+.mail:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 var(--ink); }
+.mail:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+
+footer {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 3px solid rgba(25, 25, 25, 0.15);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(25, 25, 25, 0.55);
+  display: flex;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+footer a { color: rgba(25, 25, 25, 0.75); font-weight: 700; }
+
+.updated { font-size: 14px; font-weight: 600; color: rgba(25,25,25,0.5); margin-top: -6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .hero { padding: 30px 18px 26px; }
+  .card { padding: 20px 18px; }
+  .card.tab { padding-left: 26px; }
+}
