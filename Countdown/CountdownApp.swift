@@ -16,6 +16,7 @@ struct CountdownApp: App {
     var body: some Scene {
         WindowGroup {
             EventListView()
+                .preferredColorScheme(.light)
         }
         .modelContainer(SharedStore.shared)
         .onChange(of: scenePhase) { _, phase in
