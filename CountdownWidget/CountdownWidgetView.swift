@@ -25,9 +25,12 @@ struct CountdownWidgetView: View {
         }
     }
 
-    private var background: Color {
-        if family == .systemMedium || entry.events.isEmpty {
+    @ViewBuilder
+    private var background: some View {
+        if entry.events.isEmpty {
             Loud.paper
+        } else if family == .systemMedium {
+            Rectangle().fill(.ultraThinMaterial)
         } else {
             EventColor.named(entry.events[0].colorName).color
         }
