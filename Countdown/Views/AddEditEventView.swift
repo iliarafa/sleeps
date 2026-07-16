@@ -8,15 +8,18 @@ struct AddEditEventView: View {
     @Environment(\.dismiss) private var dismiss
 
     let event: CountdownEvent?
+    var onDelete: (() -> Void)? = nil
 
     @State private var title: String
     @State private var date: Date
     @State private var icon: EventIcon
     @State private var colorName: String
     @State private var notificationsEnabled: Bool
+    @State private var showingDeleteConfirm = false
 
-    init(event: CountdownEvent?) {
+    init(event: CountdownEvent?, onDelete: (() -> Void)? = nil) {
         self.event = event
+        self.onDelete = onDelete
         _title = State(initialValue: event?.title ?? "")
         _date = State(initialValue: event?.date ?? Calendar.current.date(byAdding: .day, value: 7, to: .now)!)
         _icon = State(initialValue: event?.icon ?? .party)
@@ -111,10 +114,39 @@ struct AddEditEventView: View {
                     .tint(EventColor.green.color)
                     .padding(14)
                     .loudBox(.white, radius: 14, shadow: 4)
+
+                    if event != nil {
+                        Button {
+                            showingDeleteConfirm = true
+                        } label: {
+                            Text("DELETE THIS COUNTDOWN")
+                                .font(Loud.heavy(13))
+                                .foregroundStyle(.white)
+                                .padding(14)
+                                .frame(maxWidth: .infinity)
+                                .loudBox(EventColor.red.color, radius: 14, shadow: 4)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 10)
+                    }
                 }
                 .padding(20)
                 .padding(.bottom, 30)
             }
+        }
+        .confirmationDialog(
+            "Delete \u{201C}\(event?.title ?? "")\u{201D}?",
+            isPresented: $showingDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let event {
+                    deleteEvent(event, modelContext: modelContext)
+                }
+                onDelete?()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HStack {

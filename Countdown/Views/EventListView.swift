@@ -10,6 +10,7 @@ struct EventListView: View {
     @State private var showingAdd = false
     @State private var showingSettings = false
     @State private var path = NavigationPath()
+    @State private var pendingDelete: CountdownEvent?
 
     private var upcoming: [CountdownEvent] { events.filter { !$0.isPast } }
     private var past: [CountdownEvent] { events.filter(\.isPast).reversed() }
@@ -35,6 +36,22 @@ struct EventListView: View {
                 EventDetailView(event: event)
             }
             .toolbar(.hidden, for: .navigationBar)
+            .confirmationDialog(
+                "Delete \u{201C}\(pendingDelete?.title ?? "")\u{201D}?",
+                isPresented: Binding(
+                    get: { pendingDelete != nil },
+                    set: { if !$0 { pendingDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let event = pendingDelete {
+                        deleteEvent(event, modelContext: modelContext)
+                    }
+                    pendingDelete = nil
+                }
+                Button("Cancel", role: .cancel) {}
+            }
         }
         .onOpenURL { url in
             // sleeps://event/<uuid> — used by widget taps
@@ -142,12 +159,7 @@ struct EventListView: View {
 
     private func deleteButton(for event: CountdownEvent) -> some View {
         Button(role: .destructive) {
-            modelContext.delete(event)
-            let remaining = events.filter { $0 !== event }
-            Task {
-                await NotificationScheduler.rescheduleAll(events: remaining)
-            }
-            WidgetCenter.shared.reloadAllTimelines()
+            pendingDelete = event
         } label: {
             Label("Delete", systemImage: "trash")
         }
