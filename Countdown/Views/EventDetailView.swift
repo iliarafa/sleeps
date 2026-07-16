@@ -80,8 +80,8 @@ struct EventDetailView: View {
                 ConfettiView()
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack {
                 Button {
                     dismiss()
                 } label: {
@@ -93,8 +93,9 @@ struct EventDetailView: View {
                         .overlay(Circle().strokeBorder(Loud.ink, lineWidth: 3))
                 }
                 .accessibilityLabel("Back")
-            }
-            ToolbarItem(placement: .topBarTrailing) {
+
+                Spacer()
+
                 Button {
                     showingEdit = true
                 } label: {
@@ -107,10 +108,13 @@ struct EventDetailView: View {
                         .overlay(Capsule().strokeBorder(Loud.ink, lineWidth: 3))
                 }
             }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 6)
         }
+        .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showingEdit) {
-            AddEditEventView(event: event)
+            AddEditEventView(event: event, onDelete: { dismiss() })
         }
     }
 }
