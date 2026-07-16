@@ -15,6 +15,7 @@ struct AddEditEventView: View {
     @State private var icon: EventIcon
     @State private var colorName: String
     @State private var notificationsEnabled: Bool
+    @State private var hasTime: Bool
     @State private var showingDeleteConfirm = false
 
     init(event: CountdownEvent?, onDelete: (() -> Void)? = nil) {
@@ -25,6 +26,7 @@ struct AddEditEventView: View {
         _icon = State(initialValue: event?.icon ?? .party)
         _colorName = State(initialValue: event?.colorName ?? "blue")
         _notificationsEnabled = State(initialValue: event?.notificationsEnabled ?? true)
+        _hasTime = State(initialValue: event?.hasTime ?? false)
     }
 
     private var canSave: Bool {
@@ -47,11 +49,26 @@ struct AddEditEventView: View {
                     }
 
                     section("WHEN IS IT?") {
-                        DatePicker("Date", selection: $date, displayedComponents: .date)
-                            .datePickerStyle(.graphical)
+                        VStack(spacing: 14) {
+                            DatePicker("Date", selection: $date, displayedComponents: .date)
+                                .datePickerStyle(.graphical)
+                                .tint(EventColor.named(colorName).color)
+
+                            Toggle(isOn: $hasTime.animation()) {
+                                Text("SET A TIME")
+                                    .font(Loud.heavy(13))
+                                    .foregroundStyle(Loud.ink)
+                            }
                             .tint(EventColor.named(colorName).color)
-                            .padding(8)
-                            .loudBox(.white, radius: 14, shadow: 4)
+
+                            if hasTime {
+                                DatePicker("Time", selection: $date, displayedComponents: .hourAndMinute)
+                                    .font(Loud.bold(16))
+                                    .tint(EventColor.named(colorName).color)
+                            }
+                        }
+                        .padding(12)
+                        .loudBox(.white, radius: 14, shadow: 4)
                     }
 
                     section("PICK A PICTURE") {
@@ -207,9 +224,11 @@ struct AddEditEventView: View {
             event.emoji = icon.rawValue
             event.colorName = colorName
             event.notificationsEnabled = notificationsEnabled
+            event.hasTime = hasTime
         } else {
             let new = CountdownEvent(title: trimmed, date: date, emoji: icon.rawValue, colorName: colorName)
             new.notificationsEnabled = notificationsEnabled
+            new.hasTime = hasTime
             modelContext.insert(new)
         }
         try? modelContext.save()

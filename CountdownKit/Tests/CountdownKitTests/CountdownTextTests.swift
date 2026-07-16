@@ -40,6 +40,32 @@ final class CountdownTextTests: XCTestCase {
         XCTAssertEqual(CountdownText.sleeps(days: -3), "was 3 days ago")
     }
 
+    // MARK: clock
+
+    func testClockZero() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: 0), "0:00:00")
+    }
+
+    func testClockSeconds() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: 9), "0:00:09")
+    }
+
+    func testClockMinutesAndSeconds() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: 65), "0:01:05")
+    }
+
+    func testClockHoursMinutesSeconds() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: 3661), "1:01:01")
+    }
+
+    func testClockNearFullDay() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: 86399), "23:59:59")
+    }
+
+    func testClockClampsNegative() {
+        XCTAssertEqual(CountdownText.clock(secondsRemaining: -5), "0:00:00")
+    }
+
     // MARK: spoken (Siri)
 
     func testSpokenFuture() {

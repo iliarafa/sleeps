@@ -23,6 +23,16 @@ public enum CountdownText {
         }
     }
 
+    /// Live clock for the final day: "H:MM:SS" (hours un-padded, minutes/seconds
+    /// zero-padded). Clamps negatives to zero. e.g. 9 → "0:00:09", 3661 → "1:01:01".
+    public static func clock(secondsRemaining: Int) -> String {
+        let total = max(0, secondsRemaining)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        return String(format: "%d:%02d:%02d", h, m, s)
+    }
+
     /// Full sentence for Siri to speak: "12 days until Summer Vacation — that's 12 more sleeps!"
     public static func spoken(days: Int, title: String) -> String {
         switch days {

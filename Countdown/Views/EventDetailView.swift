@@ -7,77 +7,55 @@ struct EventDetailView: View {
 
     @State private var showingEdit = false
 
-    private var days: Int { event.daysRemaining }
+    private var dateSubtitle: String {
+        let day = event.date.formatted(.dateTime.weekday(.wide).month(.wide).day()).uppercased()
+        guard event.hasTime else { return day }
+        return day + " · " + event.date.formatted(date: .omitted, time: .shortened).uppercased()
+    }
 
     var body: some View {
-        ZStack {
-            EventColor.named(event.colorName).color.ignoresSafeArea()
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let phase = CountdownPhase.phase(eventDate: event.date, hasTime: event.hasTime, now: context.date)
 
-            VStack(spacing: 0) {
-                Spacer(minLength: 8)
+            ZStack {
+                EventColor.named(event.colorName).color.ignoresSafeArea()
 
-                // The banner card
-                VStack(spacing: 2) {
-                    event.icon.image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 56, height: 56)
-                    Text(event.title.uppercased())
-                        .font(Loud.heavy(20))
-                        .multilineTextAlignment(.center)
-                        .minimumScaleFactor(0.6)
-                    Text(event.date.formatted(.dateTime.weekday(.wide).month(.wide).day()).uppercased())
-                        .font(Loud.demi(12))
-                        .opacity(0.65)
-                }
-                .foregroundStyle(Loud.ink)
-                .padding(.horizontal, 22)
-                .padding(.vertical, 14)
-                .frame(maxWidth: 280)
-                .loudBox(Loud.paper, radius: 16)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 8)
 
-                // The flashcard numeral
-                Group {
-                    if days > 0 {
-                        Text("\(days)")
-                            .font(Loud.heavy(days >= 100 ? 130 : 180))
-                            .inkShadow(7)
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(1)
-                            .padding(.top, 10)
-                        Text(days == 1 ? "MORE SLEEP" : "MORE SLEEPS")
-                            .font(Loud.heavy(18))
-                            .kerning(5)
-                            .inkShadow(2)
-                    } else if days == 0 {
-                        Text("TODAY!")
-                            .font(Loud.heavy(64))
-                            .inkShadow(6)
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(1)
-                            .padding(.top, 26)
-                        Text("HOORAY! 🎉")
+                    // The banner card
+                    VStack(spacing: 2) {
+                        event.icon.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 56)
+                        Text(event.title.uppercased())
                             .font(Loud.heavy(20))
-                            .kerning(4)
-                            .inkShadow(2)
-                    } else {
-                        Text(CountdownText.headline(days: days).uppercased())
-                            .font(Loud.heavy(40))
-                            .inkShadow(4)
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(1)
-                            .padding(.top, 30)
+                            .multilineTextAlignment(.center)
+                            .minimumScaleFactor(0.6)
+                        Text(dateSubtitle)
+                            .font(Loud.demi(12))
+                            .multilineTextAlignment(.center)
+                            .opacity(0.65)
                     }
+                    .foregroundStyle(Loud.ink)
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 14)
+                    .frame(maxWidth: 280)
+                    .loudBox(Loud.paper, radius: 16)
+
+                    // The flashcard numeral
+                    numeral(for: phase)
+                        .foregroundStyle(.white)
+
+                    Spacer()
+                    Spacer()
                 }
-                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
 
-                Spacer()
-                Spacer()
-            }
-            .padding(.horizontal, 24)
-
-            if event.isToday {
-                ConfettiView()
+                if phase == .arrived {
+                    ConfettiView()
+                }
             }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
@@ -115,6 +93,56 @@ struct EventDetailView: View {
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showingEdit) {
             AddEditEventView(event: event, onDelete: { dismiss() })
+        }
+    }
+
+    @ViewBuilder
+    private func numeral(for phase: CountdownPhase) -> some View {
+        switch phase {
+        case .sleeps(let days):
+            Text("\(days)")
+                .font(Loud.heavy(days >= 100 ? 130 : 180))
+                .inkShadow(7)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding(.top, 10)
+            Text(days == 1 ? "MORE SLEEP" : "MORE SLEEPS")
+                .font(Loud.heavy(18))
+                .kerning(5)
+                .inkShadow(2)
+
+        case .ticking(let seconds):
+            Text(CountdownText.clock(secondsRemaining: seconds))
+                .font(Loud.heavy(64))
+                .monospacedDigit()
+                .inkShadow(6)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding(.top, 26)
+            Text("TO GO")
+                .font(Loud.heavy(18))
+                .kerning(5)
+                .inkShadow(2)
+
+        case .arrived:
+            Text(event.hasTime ? "IT'S TIME!" : "TODAY!")
+                .font(Loud.heavy(64))
+                .inkShadow(6)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding(.top, 26)
+            Text("HOORAY! 🎉")
+                .font(Loud.heavy(20))
+                .kerning(4)
+                .inkShadow(2)
+
+        case .past(let days):
+            Text(CountdownText.headline(days: days).uppercased())
+                .font(Loud.heavy(40))
+                .inkShadow(4)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding(.top, 30)
         }
     }
 }

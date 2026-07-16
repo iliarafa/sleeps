@@ -12,6 +12,9 @@ public final class CountdownEvent {
     public var colorName: String = "blue"
     public var createdAt: Date = Date()
     public var notificationsEnabled: Bool = true
+    /// Whether `date` carries a meaningful time-of-day. When false the event is
+    /// treated as all-day (day-granular). Defaulted for CloudKit compatibility.
+    public var hasTime: Bool = false
 
     public init(
         title: String = "",
