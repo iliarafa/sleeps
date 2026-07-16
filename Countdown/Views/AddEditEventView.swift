@@ -50,10 +50,8 @@ struct AddEditEventView: View {
 
                     section("WHEN IS IT?") {
                         VStack(spacing: 14) {
-                            DatePicker("Date", selection: $date, displayedComponents: .date)
-                                .datePickerStyle(.graphical)
-                                .tint(EventColor.named(colorName).color)
-                                .padding(8)
+                            LoudCalendar(date: $date, tint: EventColor.named(colorName).color)
+                                .padding(12)
                                 .loudBox(.white, radius: 14, shadow: 4)
 
                             VStack(spacing: 14) {
