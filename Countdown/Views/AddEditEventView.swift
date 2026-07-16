@@ -53,22 +53,29 @@ struct AddEditEventView: View {
                             DatePicker("Date", selection: $date, displayedComponents: .date)
                                 .datePickerStyle(.graphical)
                                 .tint(EventColor.named(colorName).color)
+                                .padding(8)
+                                .loudBox(.white, radius: 14, shadow: 4)
 
-                            Toggle(isOn: $hasTime.animation()) {
-                                Text("SET A TIME")
-                                    .font(Loud.heavy(13))
-                                    .foregroundStyle(Loud.ink)
-                            }
-                            .tint(EventColor.named(colorName).color)
+                            VStack(spacing: 14) {
+                                Toggle(isOn: $hasTime.animation()) {
+                                    Text("SET A TIME")
+                                        .font(Loud.heavy(13))
+                                        .foregroundStyle(Loud.ink)
+                                }
+                                .tint(EventColor.named(colorName).color)
 
-                            if hasTime {
-                                DatePicker("Time", selection: $date, displayedComponents: .hourAndMinute)
-                                    .font(Loud.bold(16))
+                                if hasTime {
+                                    DatePicker(selection: $date, displayedComponents: .hourAndMinute) {
+                                        Text("WHAT TIME?")
+                                            .font(Loud.heavy(13))
+                                            .foregroundStyle(Loud.ink)
+                                    }
                                     .tint(EventColor.named(colorName).color)
+                                }
                             }
+                            .padding(14)
+                            .loudBox(.white, radius: 14, shadow: 4)
                         }
-                        .padding(12)
-                        .loudBox(.white, radius: 14, shadow: 4)
                     }
 
                     section("PICK A PICTURE") {
