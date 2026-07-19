@@ -17,7 +17,7 @@ _Last verified: 2026-07-15 — 49 unit tests passing, builds clean, website live
 | Local notifications (7/3/1 days + day-of) | ✅ Code complete |
 | iCloud sync (SwiftData + CloudKit) | ✅ Code complete (verify with 2 devices, same Apple ID) |
 | Big & Loud design + 24 custom icons | ✅ Done |
-| App icon | ✅ Done (1024², in asset catalog) |
+| App icon | ✅ Done — crescent moon, generated from `docs/art/app-icon.html` |
 | Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> |
 | Ran on real device | ✅ iPhone 17 Pro Max, iOS 27 dev beta |
 | App Store submission | ⬜ Not started — see checklist below |
@@ -79,7 +79,8 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 - **Shared store.** `SharedStore` builds the SwiftData `ModelContainer` in the App Group so the app, widget, and Siri all read the same data. It **guards App-Group/iCloud availability before touching SwiftData**, because SwiftData *asserts* (crashes) rather than throwing when entitlements are missing — this is why the app runs even without a dev account/iCloud (falls back to local-only).
 - **Event pictures are `EventIcon`, not emoji.** The stored `CountdownEvent.emoji: String` field name is legacy; it holds an `EventIcon` rawValue for new events and resolves old literal emoji from pre-icon builds via `EventIcon.from(stored:)`. The `emoji` field itself was never renamed, so existing CloudKit-synced data keeps working. If you add/rename icons, update the legacy map + tests.
 - **CloudKit-safe schema rule.** Every stored property on `CountdownEvent` is a non-optional value type with an inline default and nothing is `.unique` — required for SwiftData + CloudKit. Adding a new property is fine **as long as it's defaulted** (SwiftData does a lightweight additive migration; existing records get the default). `hasTime: Bool = false` (the optional event-time feature) was added this way — no `Schema`/`SharedStore` change needed. Never make a property non-defaulted or `.unique`.
-- **Icons are generated art.** SVG source lives in `docs/art/event-icons.html`; render → slice into the package assets with the pipeline below. Don't hand-edit the PNGs.
+- **Icons are generated art.** SVG source lives in `docs/art/event-icons.html` (the 24 event icons) and `docs/art/app-icon.html` (the app icon); render with the pipelines below. Don't hand-edit the PNGs.
+- **The app icon is a crescent moon, and that's load-bearing.** It was a numeral "3" until 2026-07-19. A numeral is a *state*, not an identity — there's no answer to "why 3?" — and it reads as a notification badge on a home screen. A moon is literally what a *sleep* is, so it encodes the app's name and never goes stale. It also carries **no drop shadow**, unlike `loudBox`: hard-offsetting a shape with 25.5° cusps pushes an ink "claw" past each horn tip that reads as a chip, which is the exact defect the old icon had. Blunting the horns doesn't fix it, only moves it. The 24 event icons are likewise fill + stroke with no drop.
 - **Siri caveat (Apple limitation):** third-party phrases must include the app name — "how long until X **in Sleeps**". That's why the name is one short word.
 - **Widgets** support `.systemSmall` + `.systemMedium` only (no Lock Screen / Large — intentional, per owner). Tapping deep-links via `sleeps://event/<id>`. The **medium** widget's container background is `.ultraThinMaterial` (frosted/translucent, adapts to the wallpaper); the **small** widget's background is the single event's color, and the empty state stays cream (`Loud.paper`). See `background` in `CountdownWidget/CountdownWidgetView.swift`.
 - **Deleting events.** Two entry points, both confirm first via a `confirmationDialog`: the red "DELETE THIS COUNTDOWN" button in the edit sheet (shown only when editing an existing event) and the list long-press context menu. Both route through one shared `deleteEvent(_:modelContext:)` helper in `Countdown/EventDeletion.swift` that deletes, saves, reschedules notifications, and reloads widget timelines. `AddEditEventView` takes an `onDelete` callback so deleting from the edit sheet also pops the pushed detail screen back to the list. (The detail screen itself has no delete button — edit-only, per owner.)
@@ -102,6 +103,41 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 # 4. rebuild; every tile must be exactly 216×216.
 ```
 Design spec (stroke weights, palette) is commented at the top of `event-icons.html`.
+
+### Regenerating the app icon
+
+```sh
+# 1. edit docs/art/app-icon.html (single 1024x1024 tile; geometry only, no <text>)
+# 2. render the master natively at 1024:
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+  --disable-gpu --no-sandbox --no-first-run --no-default-browser-check \
+  --force-device-scale-factor=1 --user-data-dir="$(mktemp -d)" \
+  --default-background-color=FFB800FF --window-size=1024,1024 \
+  --screenshot=/tmp/master.png "file://$PWD/docs/art/app-icon.html"
+# 3. flatten + derive the three outputs (CoreGraphics, not sips):
+swift docs/art/flatten-png.swift /tmp/master.png \
+  Countdown/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+swift docs/art/flatten-png.swift /tmp/master.png docs/screenshots/icon.png 320
+swift docs/art/flatten-png.swift /tmp/master.png docs/icon.png 180
+```
+
+Three traps, all of which cost real time on 2026-07-19:
+
+- **Chrome won't rasterise below ~512px.** `--window-size=180,180` silently produces a
+  180×180 **crop of a ~500px layout** — right dimensions, wrong picture, and the moon
+  isn't even in frame. `--force-device-scale-factor` is clamped at 0.5, so it can't get
+  you there either. Hence: render the master at 1024 and downscale in `flatten-png.swift`
+  (`.high` interpolation). iOS does the same to the 1024 on device.
+- **Headless Chrome often won't exit** after `--screenshot` on this page. The PNG *is*
+  written first, so launch it detached, wait for the file to stop growing, then kill it.
+  Always use a fresh `--user-data-dir`; a stale `SingletonLock` aborts the run outright.
+- **Chrome emits an alpha channel**, and App Store Connect hard-rejects app icons that
+  carry one. `flatten-png.swift` is mandatory, not optional.
+
+`AppIcon.appiconset/Contents.json` needs no edit — it's a single universal 1024² entry.
+`docs/style.css` applies the rounding and ink border in CSS, which is why `docs/icon.png`
+stays square and full-bleed. Verify outputs with `file` — it must say `8-bit/color RGB`,
+never `RGBA`.
 
 ---
 
