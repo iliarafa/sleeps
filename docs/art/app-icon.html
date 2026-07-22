@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <style>
-  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#FFB800}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#9B87D4}
   svg{display:block;width:100%;height:100%}
 </style>
 <!--
@@ -13,8 +13,29 @@
   notification badge on a home screen. A moon encodes the name and never goes stale.
 
   SPEC: moon outline stroke 18, confetti stroke 11. All joins/caps round.
-  Palette: ink #191919, sun #FFB800, white #FFFFFF, red #FF4B3E,
-  blue #2D6CDF, green #00A878, pink #FF4D8D.
+  Palette: ink #191919, night #9B87D4, sun #FFB800, red #FF4B3E,
+  teal #00B0C7, green #00A878, pink #FF4D8D.
+
+  WHY A SUN-YELLOW MOON ON PURPLE: a moon belongs in a night sky, so a white
+  moon on daytime yellow was the relationship inverted. Putting Loud.sun on
+  the moon keeps the brand colour as the icon's hero while the ground finally
+  reads as night. Note the wordmark stays ink-on-sun, so icon and wordmark now
+  share an ACCENT rather than a ground.
+
+  WHY THIS PARTICULAR PURPLE (#9B87D4, not a deep indigo): the ink outline and
+  the yellow moon want opposite grounds. Measured contrast against #191919 and
+  #FFB800 respectively —
+      #C7B6EC  ink 9.49  moon 1.07      #7048E8  ink 3.17  moon 3.20
+      #9B87D4  ink 5.70  moon 1.78      #3D2E7C  ink 1.57  moon 6.44
+      #8B6FD4  ink 4.46  moon 2.28      #2A1F5C  ink 1.21  moon 8.36
+  Big & Loud defines every shape with a 3pt ink outline, not with luminance
+  contrast — that is why white type sits on saturated cards throughout the app.
+  So a low moon-vs-ground ratio is fine, but a vanishing outline breaks the
+  language. Anything darker than roughly #7048E8 loses the outline. Verified
+  legible down to 29px.
+
+  Blue confetti was swapped for teal: #2D6CDF muddied against purple. It was
+  crisp on the old yellow ground.
 
   NO DROP SHADOW — deliberate, and it took a render to see why. A hard offset
   shadow is a CARD treatment (LoudTheme.loudBox); the 24 event icons are fill +
@@ -44,7 +65,7 @@
      stroke-linejoin="round" stroke-linecap="round">
 
   <!-- full-bleed background: THIS sets the colour, not any browser flag -->
-  <rect width="1024" height="1024" fill="#FFB800"/>
+  <rect width="1024" height="1024" fill="#9B87D4"/>
 
   <defs>
     <path id="moon"
@@ -53,13 +74,13 @@
 
   <!-- the moon (no drop shadow — see header) -->
   <g transform="rotate(-40 503 496)">
-    <use href="#moon" fill="#FFFFFF" stroke="#191919" stroke-width="18"/>
+    <use href="#moon" fill="#FFB800" stroke="#191919" stroke-width="18"/>
   </g>
 
   <!-- confetti: unrotated, corners, no shadow, all inside the iOS squircle -->
   <g stroke="#191919" stroke-width="11">
     <rect x="156" y="156" width="48" height="48" fill="#FF4B3E" transform="rotate(17 180 180)"/>
-    <circle cx="852" cy="196" r="28" fill="#2D6CDF"/>
+    <circle cx="852" cy="196" r="28" fill="#00B0C7"/>
     <circle cx="186" cy="836" r="24" fill="#FF4D8D"/>
     <rect x="824" y="824" width="44" height="44" fill="#00A878" transform="rotate(-14 846 846)"/>
   </g>
