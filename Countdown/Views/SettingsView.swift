@@ -61,7 +61,7 @@ struct SettingsView: View {
                     .padding(14)
                     .loudBox(.white, radius: 14, shadow: 4)
 
-                    Text("Made with ❤️ for kids who can't wait.")
+                    Text("Made with love for kids who can't wait.")
                         .font(Loud.demi(12))
                         .foregroundStyle(Loud.ink.opacity(0.5))
                         .frame(maxWidth: .infinity)

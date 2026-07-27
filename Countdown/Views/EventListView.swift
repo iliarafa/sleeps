@@ -110,19 +110,36 @@ struct EventListView: View {
         .background(Loud.paper)
     }
 
-    /// Placeholder art — the header "+" is the way to add.
+    /// First-run: sleeping-kid art above one clear way in.
     private var emptyState: some View {
-        VStack {
+        VStack(spacing: 8) {
             Spacer()
             Image("EmptyArt")
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 300)
+                .frame(maxWidth: 330)
+                .allowsHitTesting(false)
+
+            Button {
+                showingAdd = true
+            } label: {
+                Text("ADD YOUR FIRST COUNTDOWN")
+                    .font(Loud.heavy(16))
+                    .kerning(0.5)
+                    .foregroundStyle(Loud.ink)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 15)
+                    .loudBox(Loud.sun)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Add your first countdown")
+
             Spacer()
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .allowsHitTesting(false)
+        .padding(.horizontal, 24)
     }
 
     private var eventList: some View {
