@@ -105,7 +105,15 @@ nav { display: flex; gap: 10px; flex-wrap: wrap; }
 .hero.green { background: var(--green); }
 .hero.blue  { background: var(--blue); }
 
-.hero .emoji { font-size: 46px; line-height: 1; }
+.hero .chip {
+  width: 78px; height: 78px;
+  margin: 0 auto 2px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.hero .chip img { width: 48px; height: 48px; display: block; }
 .hero-num {
   font-weight: 800;
   font-size: clamp(120px, 34vw, 190px);
