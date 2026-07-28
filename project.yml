@@ -74,6 +74,7 @@ targets:
     info:
       path: CountdownWidget/Info.plist
       properties:
+        CFBundleDisplayName: Sleeps Widget
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     entitlements:
