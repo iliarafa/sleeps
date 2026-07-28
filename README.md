@@ -1,4 +1,4 @@
-# Sleeps 🎉
+# Sleeps <img src="docs/icons/party.png" alt="party popper" height="30">
 
 **"How long until August?" — a countdown app for kids.**
 
