@@ -1,4 +1,4 @@
-# Sleeps <img src="docs/icons/party.png" alt="party popper" height="30">
+# <img src="docs/icons/party.png" alt="party popper" height="40" align="left"> Sleeps
 
 **"How long until August?" — a countdown app for kids.**
 
