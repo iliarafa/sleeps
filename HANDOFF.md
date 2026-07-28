@@ -2,7 +2,7 @@
 
 **Sleeps** is a countdown app for kids: "How long until August?" answered in *sleeps*, on the home screen, via widgets, and via Siri. Native SwiftUI, headed for the App Store (Made for Kids). Repo: <https://github.com/iliarafa/sleeps> (public).
 
-_Last verified: 2026-07-15 — 49 unit tests passing, builds clean, website live._
+_Last verified: 2026-07-27 — app icon + empty-state art refreshed (see below); builds clean (0 warnings); website live. 49 unit tests, last run 2026-07-15._
 
 ---
 
@@ -17,7 +17,7 @@ _Last verified: 2026-07-15 — 49 unit tests passing, builds clean, website live
 | Local notifications (7/3/1 days + day-of) | ✅ Code complete |
 | iCloud sync (SwiftData + CloudKit) | ✅ Code complete (verify with 2 devices, same Apple ID) |
 | Big & Loud design + 24 custom icons | ✅ Done |
-| App icon | ✅ Done — crescent moon, generated from `docs/art/app-icon.html` |
+| App icon | ✅ Done — flat "kid asleep in bed" raster, master `docs/art/app-icon.png` (replaced the generated crescent 2026-07-27; **website icons still show the old crescent** — see below) |
 | Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> |
 | Ran on real device | ✅ iPhone 17 Pro Max, iOS 27 dev beta |
 | App Store submission | ⬜ Not started — see checklist below |
@@ -79,10 +79,12 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 - **Shared store.** `SharedStore` builds the SwiftData `ModelContainer` in the App Group so the app, widget, and Siri all read the same data. It **guards App-Group/iCloud availability before touching SwiftData**, because SwiftData *asserts* (crashes) rather than throwing when entitlements are missing — this is why the app runs even without a dev account/iCloud (falls back to local-only).
 - **Event pictures are `EventIcon`, not emoji.** The stored `CountdownEvent.emoji: String` field name is legacy; it holds an `EventIcon` rawValue for new events and resolves old literal emoji from pre-icon builds via `EventIcon.from(stored:)`. The `emoji` field itself was never renamed, so existing CloudKit-synced data keeps working. If you add/rename icons, update the legacy map + tests.
 - **CloudKit-safe schema rule.** Every stored property on `CountdownEvent` is a non-optional value type with an inline default and nothing is `.unique` — required for SwiftData + CloudKit. Adding a new property is fine **as long as it's defaulted** (SwiftData does a lightweight additive migration; existing records get the default). `hasTime: Bool = false` (the optional event-time feature) was added this way — no `Schema`/`SharedStore` change needed. Never make a property non-defaulted or `.unique`.
-- **Icons are generated art.** SVG source lives in `docs/art/event-icons.html` (the 24 event icons) and `docs/art/app-icon.html` (the app icon); render with the pipelines below. Don't hand-edit the PNGs.
+- **Event icons are generated art; the app icon is not (anymore).** The 24 **event** icons are SVG/HTML in `docs/art/event-icons.html` — render with the pipeline below, don't hand-edit the PNGs. The **app icon** is no longer generated: since 2026-07-27 it's a hand-made raster (kid asleep in bed), master `docs/art/app-icon.png`. `docs/art/app-icon.html` (the old crescent generator) is kept for its design notes but no longer produces AppIcon.
+- **⚠️ App icon changed 2026-07-27 — now a flat "kid asleep in bed" raster** (master `docs/art/app-icon.png`, matching the in-app empty-state art), replacing the crescent. The three bullets below were written for the crescent: treat the crescent- and purple-specific reasoning as historical, but the **colour-role principles still hold** (esp. `Loud.sun` = brand + primary action, the `EventColor` rules, and the `AccentColor` loose end).
 - **The app icon is a crescent moon, and that's load-bearing.** It was a numeral "3" until 2026-07-19. A numeral is a *state*, not an identity — there's no answer to "why 3?" — and it reads as a notification badge on a home screen. A moon is literally what a *sleep* is, so it encodes the app's name and never goes stale. It also carries **no drop shadow**, unlike `loudBox`: hard-offsetting a shape with 25.5° cusps pushes an ink "claw" past each horn tip that reads as a chip, which is the exact defect the old icon had. Blunting the horns doesn't fix it, only moves it. The 24 event icons are likewise fill + stroke with no drop.
 - **The icon is a sun-yellow moon on `#9B87D4` purple — and the purple has a floor.** Until 2026-07-22 it was a white moon on sun-yellow, which had the relationship inverted: a moon belongs in a night sky. Moving `Loud.sun` onto the *moon* keeps the brand colour as the icon's hero while the ground reads as night. **Don't go darker.** The ink outline and the yellow moon want opposite grounds — measured contrast is `#C7B6EC` ink 9.49/moon 1.07, `#9B87D4` ink 5.70/moon 1.78, `#7048E8` ink 3.17/moon 3.20, `#3D2E7C` ink 1.57/moon 6.44, `#2A1F5C` ink 1.21/moon 8.36. Big & Loud defines shapes with the 3pt ink outline rather than luminance contrast (hence white type on saturated cards everywhere), so a low moon-vs-ground ratio is fine but a vanishing outline breaks the language. Anything darker than roughly `#7048E8` loses the outline. The blue confetti became teal in the same change — `#2D6CDF` muddied against purple.
 - **Colors have roles, and `Loud.sun` is brand — not a swatch.** Four layers: `Loud.ink` for structure (text, outlines, hard shadows), `Loud.paper`/white for grounds and surfaces, **`Loud.sun` for brand + primary action**, and the seven `EventColor` cases for user content. Sun is **deliberately not an `EventColor`** — it's every affirmative control in the app (the SLEEPS badge `EventListView.swift:77`, the `+` `:101`, SAVE `AddEditEventView.swift:203`, DONE `SettingsView.swift:86`, the parental-gate CONTINUE `:169`, the icon-picker selection ring `AddEditEventView.swift:91`), and on SAVE its opacity *is* the enabled/disabled signal. The settings gear one button away is `Loud.paper`; sun marks the *primary* action specifically. Three consequences: (1) **the icon and the wordmark must share sun somewhere.** They were the same *ground* until 2026-07-22; since the purple ground landed they share it as an *accent* instead — the moon is `Loud.sun`, the wordmark is still ink-on-sun (`EventListView.swift:77`, matching `docs/style.css:67` pixel for pixel: sun fill, ink text, 3px ink border, 4px hard offset, no rounding). Drop sun from the icon entirely and the icon, app, website, and store listing stop reading as one brand; (2) promoting an `EventColor` to brand status collides with user content — a kid whose event is that color would see their card in the app's brand color, which keeping sun out of `EventColor` is what prevents; (3) **removing an `EventColor` case is a silent data migration** — `EventColor.named` falls back to `.blue` (`EventColor.swift:23`), so already-synced records in the removed color quietly turn blue. This is why, on 2026-07-22, purple was rejected as a *replacement* for sun but adopted as the icon's *ground* — the icon's purple is a one-off in the art source (`docs/art/app-icon.html`), deliberately not `EventColor.purple` and not a `Loud` token, so it stays out of both the content palette and the chrome palette. Known loose end: `Assets.xcassets/AccentColor.colorset` is `#4A8BFA`, matching neither `Loud.sun` nor `EventColor.blue` (`#2D6CDF`) — nearly invisible since every call site hardcodes its color, but it's the one theme value outside the system.
+- **Empty-state art + first-run CTA (2026-07-27).** With an empty list, `EventListView.emptyState` shows the "kid asleep in bed" illustration (`Image("EmptyArt")` → `Countdown/Assets.xcassets/EmptyArt.imageset/empty-art@3x.png`, master `docs/art/empty-art.png`, transparent 1000²) above an "ADD YOUR FIRST COUNTDOWN" `Loud.sun` button that opens the add sheet. It's a hand-made raster with no SVG source — to change it, replace `docs/art/empty-art.png` and copy it over the `@3x` PNG. Same day: the Settings footer became "Made with love for kids who can't wait." (was a ❤️ emoji).
 - **Siri caveat (Apple limitation):** third-party phrases must include the app name — "how long until X **in Sleeps**". That's why the name is one short word.
 - **Widgets** support `.systemSmall` + `.systemMedium` only (no Lock Screen / Large — intentional, per owner). Tapping deep-links via `sleeps://event/<id>`. The **medium** widget's container background is `.ultraThinMaterial` (frosted/translucent, adapts to the wallpaper); the **small** widget's background is the single event's color, and the empty state stays cream (`Loud.paper`). See `background` in `CountdownWidget/CountdownWidgetView.swift`.
 - **Deleting events.** Two entry points, both confirm first via a `confirmationDialog`: the red "DELETE THIS COUNTDOWN" button in the edit sheet (shown only when editing an existing event) and the list long-press context menu. Both route through one shared `deleteEvent(_:modelContext:)` helper in `Countdown/EventDeletion.swift` that deletes, saves, reschedules notifications, and reloads widget timelines. `AddEditEventView` takes an `onDelete` callback so deleting from the edit sheet also pops the pushed detail screen back to the list. (The detail screen itself has no delete button — edit-only, per owner.)
@@ -107,6 +109,24 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 Design spec (stroke weights, palette) is commented at the top of `event-icons.html`.
 
 ### Regenerating the app icon
+
+**Since 2026-07-27 the app icon is a hand-made raster, not generated.** To change it: drop a 1024×1024 illustration at `docs/art/app-icon.png` (opaque — no transparency), then flatten to an alpha-free PNG and install (App Store Connect hard-rejects icons carrying alpha):
+
+```sh
+swift docs/art/flatten-png.swift docs/art/app-icon.png \
+  Countdown/Assets.xcassets/AppIcon.appiconset/icon-1024.png 0 FFFFFF
+sips -g hasAlpha Countdown/Assets.xcassets/AppIcon.appiconset/icon-1024.png   # must print "hasAlpha: no"
+```
+`AppIcon.appiconset/Contents.json` stays a single universal 1024² entry — no edit needed.
+
+**⚠️ Website icons are out of sync:** `docs/icon.png` (180) and `docs/screenshots/icon.png` (320) still show the **old crescent**. To make the site match the app, derive them from the new art:
+
+```sh
+swift docs/art/flatten-png.swift docs/art/app-icon.png docs/icon.png 180 FFFFFF
+swift docs/art/flatten-png.swift docs/art/app-icon.png docs/screenshots/icon.png 320 FFFFFF
+```
+
+The original crescent generator (`docs/art/app-icon.html` + headless Chrome) is **superseded**, but kept for its geometry + design notes. Its pipeline, preserved below for reference:
 
 ```sh
 # 1. edit docs/art/app-icon.html (single 1024x1024 tile; geometry only, no <text>)
