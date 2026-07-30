@@ -2,7 +2,7 @@
 
 **Sleeps** is a countdown app for kids: "How long until August?" answered in *sleeps*, on the home screen, via widgets, and via Siri. Native SwiftUI, headed for the App Store (Made for Kids). Repo: <https://github.com/iliarafa/sleeps> (public).
 
-_Last verified: 2026-07-27 — app icon + empty-state art refreshed (see below); builds clean (0 warnings); website live. 49 unit tests, last run 2026-07-15._
+_Last verified: 2026-07-28 — website/README art synced to app icons; widget display name set to "Sleeps Widget"; builds clean (0 warnings); website live. 49 unit tests, last run 2026-07-15._
 
 ---
 
@@ -13,12 +13,12 @@ _Last verified: 2026-07-27 — app icon + empty-state art refreshed (see below);
 | Core app (list / add-edit / detail / settings) | ✅ Done, verified in simulator + on device |
 | Date math (calendar-day, DST-safe) | ✅ Done, unit-tested |
 | Siri / App Intents | ✅ Code complete (verify on device) |
-| Home-screen widgets (small + medium) | ✅ Done, verified on simulator home screen |
+| Home-screen widgets (small + medium) | ✅ Done, verified on simulator home screen; display name **"Sleeps Widget"** |
 | Local notifications (7/3/1 days + day-of) | ✅ Code complete |
 | iCloud sync (SwiftData + CloudKit) | ✅ Code complete (verify with 2 devices, same Apple ID) |
 | Big & Loud design + 24 custom icons | ✅ Done |
-| App icon | ✅ Done — flat "kid asleep in bed" raster, master `docs/art/app-icon.png` (replaced the generated crescent 2026-07-27; **website icons still show the old crescent** — see below) |
-| Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> |
+| App icon | ✅ Done — flat "kid asleep in bed" raster, master `docs/art/app-icon.png` (replaced the generated crescent 2026-07-27; website favicon/logo synced 2026-07-28) |
+| Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> — hero cards use custom tent/party icons (not emoji); README title uses party icon |
 | Ran on real device | ✅ iPhone 17 Pro Max, iOS 27 dev beta |
 | App Store submission | ⬜ Not started — see checklist below |
 
@@ -31,7 +31,7 @@ _Last verified: 2026-07-27 — app icon + empty-state art refreshed (see below);
 - **URL scheme:** `sleeps://event/<uuid>` (widget deep links)
 - **Signing team:** `3DLV25C9VK` (set in `project.yml`)
 - **Min iOS:** 17.0 · **Built with:** Xcode 26
-- **Display name:** Sleeps
+- **Display names:** app `Sleeps` · widget `Sleeps Widget` (both via `CFBundleDisplayName` in `project.yml`)
 - **Public contact email:** `iliasr@me.com` (used on the website and for App Store support)
 - **Owner's account email:** `iamilias@gmail.com` (personal Apple/Claude login) — *not* the `ilias@csrllc.net` that appears in some tooling context; don't derive identifiers from that.
 
@@ -49,9 +49,10 @@ CountdownKit/       Swift package: model, date math, text, notification planner,
   Sources/CountdownKit/Resources/Icons.xcassets/   24 icon-*.imageset (@3x PNGs)
   Tests/CountdownKitTests/         49 tests (date math, text, planner, icon mapping, countdown phase, calendar grid)
 Countdown/          App target: Views/, EventDeletion.swift, Support/NotificationScheduler, Intents/HowLongUntilIntent
-CountdownWidget/    Widget extension (small + medium)
+CountdownWidget/    Widget extension (small + medium); display name "Sleeps Widget"
 Shared/Intents/     CountdownEventEntity + SelectEventIntent (compiled into app AND widget)
 docs/               Website (index/privacy/support .html + style.css) AND art sources + screenshots
+  icons/            Website/README copies of event icons (tent.png, party.png) for hero + title
 project.yml         XcodeGen spec
 ```
 
@@ -86,7 +87,7 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 - **Colors have roles, and `Loud.sun` is brand — not a swatch.** Four layers: `Loud.ink` for structure (text, outlines, hard shadows), `Loud.paper`/white for grounds and surfaces, **`Loud.sun` for brand + primary action**, and the seven `EventColor` cases for user content. Sun is **deliberately not an `EventColor`** — it's every affirmative control in the app (the SLEEPS badge `EventListView.swift:77`, the `+` `:101`, SAVE `AddEditEventView.swift:203`, DONE `SettingsView.swift:86`, the parental-gate CONTINUE `:169`, the icon-picker selection ring `AddEditEventView.swift:91`), and on SAVE its opacity *is* the enabled/disabled signal. The settings gear one button away is `Loud.paper`; sun marks the *primary* action specifically. Three consequences: (1) **the icon and the wordmark must share sun somewhere.** They were the same *ground* until 2026-07-22; since the purple ground landed they share it as an *accent* instead — the moon is `Loud.sun`, the wordmark is still ink-on-sun (`EventListView.swift:77`, matching `docs/style.css:67` pixel for pixel: sun fill, ink text, 3px ink border, 4px hard offset, no rounding). Drop sun from the icon entirely and the icon, app, website, and store listing stop reading as one brand; (2) promoting an `EventColor` to brand status collides with user content — a kid whose event is that color would see their card in the app's brand color, which keeping sun out of `EventColor` is what prevents; (3) **removing an `EventColor` case is a silent data migration** — `EventColor.named` falls back to `.blue` (`EventColor.swift:23`), so already-synced records in the removed color quietly turn blue. This is why, on 2026-07-22, purple was rejected as a *replacement* for sun but adopted as the icon's *ground* — the icon's purple is a one-off in the art source (`docs/art/app-icon.html`), deliberately not `EventColor.purple` and not a `Loud` token, so it stays out of both the content palette and the chrome palette. Known loose end: `Assets.xcassets/AccentColor.colorset` is `#4A8BFA`, matching neither `Loud.sun` nor `EventColor.blue` (`#2D6CDF`) — nearly invisible since every call site hardcodes its color, but it's the one theme value outside the system.
 - **Empty-state art + first-run CTA (2026-07-27).** With an empty list, `EventListView.emptyState` shows the "kid asleep in bed" illustration (`Image("EmptyArt")` → `Countdown/Assets.xcassets/EmptyArt.imageset/empty-art@3x.png`, master `docs/art/empty-art.png`, transparent 1000²) above an "ADD YOUR FIRST COUNTDOWN" `Loud.sun` button that opens the add sheet. It's a hand-made raster with no SVG source — to change it, replace `docs/art/empty-art.png` and copy it over the `@3x` PNG. Same day: the Settings footer became "Made with love for kids who can't wait." (was a ❤️ emoji).
 - **Siri caveat (Apple limitation):** third-party phrases must include the app name — "how long until X **in Sleeps**". That's why the name is one short word.
-- **Widgets** support `.systemSmall` + `.systemMedium` only (no Lock Screen / Large — intentional, per owner). Tapping deep-links via `sleeps://event/<id>`. The **medium** widget's container background is `.ultraThinMaterial` (frosted/translucent, adapts to the wallpaper); the **small** widget's background is the single event's color, and the empty state stays cream (`Loud.paper`). See `background` in `CountdownWidget/CountdownWidgetView.swift`.
+- **Widgets** support `.systemSmall` + `.systemMedium` only (no Lock Screen / Large — intentional, per owner). Display name is **Sleeps Widget** (`CFBundleDisplayName` / `INFOPLIST_KEY_CFBundleDisplayName` on the CountdownWidget target in `project.yml` — regenerate with XcodeGen after edits). Tapping deep-links via `sleeps://event/<id>`. The **medium** widget's container background is `.ultraThinMaterial` (frosted/translucent, adapts to the wallpaper); the **small** widget's background is the single event's color, and the empty state stays cream (`Loud.paper`). See `background` in `CountdownWidget/CountdownWidgetView.swift`.
 - **Deleting events.** Two entry points, both confirm first via a `confirmationDialog`: the red "DELETE THIS COUNTDOWN" button in the edit sheet (shown only when editing an existing event) and the list long-press context menu. Both route through one shared `deleteEvent(_:modelContext:)` helper in `Countdown/EventDeletion.swift` that deletes, saves, reschedules notifications, and reloads widget timelines. `AddEditEventView` takes an `onDelete` callback so deleting from the edit sheet also pops the pushed detail screen back to the list. (The detail screen itself has no delete button — edit-only, per owner.)
 - **Light-only by design.** The palette is hardcoded light (cream/white backgrounds, `Loud.ink` text); the root view is pinned with `.preferredColorScheme(.light)` in `CountdownApp.swift`. Without the pin, system controls — e.g. the `.hourAndMinute` time `DatePicker` in add/edit — follow the OS into dark mode and render white-on-white (unreadable). Don't remove the pin unless you're properly theming dark mode.
 - **The date picker is a custom calendar.** `Countdown/Views/LoudCalendar.swift` draws the month grid in the app's AvenirNext (`Loud`) fonts because the system graphical `DatePicker`/`UICalendarView` can't be re-fonted (`.font()` has no effect). Month-grid math (first-weekday offset, month length, DST) lives in the pure, unit-tested `CalendarGrid` helper in CountdownKit. Selecting a day preserves any time already on the date (`CalendarGrid.combine`), so it composes with the time feature. The `.hourAndMinute` time picker is still a system `DatePicker`.
@@ -119,7 +120,7 @@ sips -g hasAlpha Countdown/Assets.xcassets/AppIcon.appiconset/icon-1024.png   # 
 ```
 `AppIcon.appiconset/Contents.json` stays a single universal 1024² entry — no edit needed.
 
-**⚠️ Website icons are out of sync:** `docs/icon.png` (180) and `docs/screenshots/icon.png` (320) still show the **old crescent**. To make the site match the app, derive them from the new art:
+Website icons are derived from the same master (`docs/icon.png` 180, `docs/screenshots/icon.png` 320). To re-derive after changing the art:
 
 ```sh
 swift docs/art/flatten-png.swift docs/art/app-icon.png docs/icon.png 180 FFFFFF
@@ -174,6 +175,11 @@ GitHub Pages, built from `main` `/docs`. Repo is **public** (required for Pages 
 
 Edit the `.html`/`style.css` in `docs/`, push to `main`, Pages redeploys automatically.
 The app's **Settings → For grown-ups** links Support + Privacy behind a parental gate.
+
+**Brand art on the site/README (synced 2026-07-28):**
+- Favicon/logo: `docs/icon.png` (180) + `docs/screenshots/icon.png` (320) — kid-in-bed, derived from `docs/art/app-icon.png` (see regenerate commands above).
+- Hero cards on index/support use the custom **tent** / **party** event icons (`docs/icons/tent.png`, `docs/icons/party.png`) inside a cream LoudChip-style `.hero .chip` circle — not emoji — so they match in-app event cards against the green hero.
+- README H1 uses the same party icon (`docs/icons/party.png`) floated left beside "Sleeps" (`align="left"`) — GitHub forces heading images to `display:block` otherwise, which drops the icon onto its own line.
 
 ---
 
