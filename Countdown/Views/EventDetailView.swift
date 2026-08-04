@@ -3,6 +3,7 @@ import CountdownKit
 
 struct EventDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let event: CountdownEvent
 
     @State private var showingEdit = false
@@ -41,7 +42,7 @@ struct EventDetailView: View {
                     .foregroundStyle(Loud.ink)
                     .padding(.horizontal, 22)
                     .padding(.vertical, 14)
-                    .frame(maxWidth: 280)
+                    .frame(maxWidth: sizeClass == .regular ? 420 : 280)
                     .loudBox(Loud.paper, radius: 16)
 
                     // The flashcard numeral

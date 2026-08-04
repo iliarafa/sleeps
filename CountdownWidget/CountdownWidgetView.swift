@@ -19,6 +19,8 @@ struct CountdownWidgetView: View {
             switch family {
             case .systemMedium:
                 MediumView(events: entry.events)
+            case .systemLarge, .systemExtraLarge:
+                LargeWidgetView(events: entry.events)
             case .accessoryCircular:
                 AccessoryCircularView(event: entry.events[0])
             case .accessoryRectangular:
@@ -39,7 +41,7 @@ struct CountdownWidgetView: View {
             } else {
                 Loud.paper
             }
-        } else if family == .systemMedium {
+        } else if family == .systemMedium || family == .systemLarge || family == .systemExtraLarge {
             Rectangle().fill(.ultraThinMaterial)
         } else if isAccessoryFamily {
             AccessoryWidgetBackground()

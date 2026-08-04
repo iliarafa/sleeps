@@ -5,6 +5,7 @@ import CountdownKit
 
 struct EventListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Query(sort: \CountdownEvent.date) private var events: [CountdownEvent]
 
     @State private var showingAdd = false
@@ -169,6 +170,7 @@ struct EventListView: View {
                 }
             }
             .padding(.horizontal, 18)
+            .padding(.horizontal, sizeClass == .regular ? 48 : 0)
             .padding(.top, 4)
             .padding(.bottom, 30)
         }
