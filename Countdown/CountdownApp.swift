@@ -11,6 +11,7 @@ struct CountdownApp: App {
         #if DEBUG
         seedSampleDataIfRequested()
         #endif
+        WatchSync.shared.start()
     }
 
     var body: some Scene {
@@ -22,9 +23,19 @@ struct CountdownApp: App {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
                 WidgetCenter.shared.reloadAllTimelines()
+                pushToWatch()
             }
         }
     }
+}
+
+/// Sends the current store contents to the Watch. The Watch has no store of its
+/// own, so we re-push whenever the app leaves the foreground.
+@MainActor
+private func pushToWatch() {
+    let context = ModelContext(SharedStore.shared)
+    let events = (try? context.fetch(FetchDescriptor<CountdownEvent>())) ?? []
+    WatchSync.pushUpcoming(events: events)
 }
 
 #if DEBUG

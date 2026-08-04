@@ -62,6 +62,7 @@ struct EventListView: View {
                     modelContext.insert(event)
                     try? modelContext.save()
                     WidgetCenter.shared.reloadAllTimelines()
+                    WatchSync.pushUpcoming(events: events + [event])
                     Task {
                         await NotificationScheduler.rescheduleAll(events: events + [event])
                     }
@@ -83,6 +84,7 @@ struct EventListView: View {
         }
         .task {
             _ = YearlyRepeat.advancePastEvents(in: modelContext)
+            WatchSync.pushUpcoming(events: events)
             await NotificationScheduler.rescheduleAll(events: events)
         }
     }

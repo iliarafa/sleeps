@@ -259,6 +259,7 @@ struct AddEditEventView: View {
             await NotificationScheduler.rescheduleAll(events: all)
         }
         WidgetCenter.shared.reloadAllTimelines()
+        WatchSync.pushUpcoming(events: all)
         dismiss()
     }
 }

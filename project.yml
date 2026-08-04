@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: com.iamilias
   deploymentTarget:
     iOS: "17.0"
+    watchOS: "10.0"
   createIntermediateGroups: true
 
 settings:
@@ -27,6 +28,9 @@ targets:
     dependencies:
       - package: CountdownKit
       - target: CountdownWidget
+      # Embeds the Watch app, so building this scheme requires the watchOS
+      # platform locally: xcodebuild -downloadPlatform watchOS
+      - target: CountdownWatch
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.iamilias.sleeps
@@ -83,11 +87,70 @@ targets:
         com.apple.security.application-groups:
           - group.com.iamilias.sleeps
 
+  # Read-only glance. The phone owns the data and pushes it over
+  # WatchConnectivity; nothing is created or edited here.
+  CountdownWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - CountdownWatch
+    dependencies:
+      - package: CountdownKit
+      - target: CountdownWatchWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.iamilias.sleeps.watchkitapp
+        INFOPLIST_KEY_CFBundleDisplayName: Sleeps
+    info:
+      path: CountdownWatch/Info.plist
+      properties:
+        CFBundleDisplayName: Sleeps
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.iamilias.sleeps
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: CountdownWatch/CountdownWatch.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.iamilias.sleeps
+
+  CountdownWatchWidget:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - CountdownWatchWidget
+    dependencies:
+      - package: CountdownKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.iamilias.sleeps.watchkitapp.complication
+        INFOPLIST_KEY_CFBundleDisplayName: Sleeps
+    info:
+      path: CountdownWatchWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Sleeps
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: CountdownWatchWidget/CountdownWatchWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.iamilias.sleeps
+
 schemes:
   Countdown:
     build:
       targets:
         Countdown: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  CountdownWatch:
+    build:
+      targets:
+        CountdownWatch: all
     run:
       config: Debug
     archive:

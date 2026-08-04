@@ -12,4 +12,5 @@ func deleteEvent(_ event: CountdownEvent, modelContext: ModelContext) {
         await NotificationScheduler.rescheduleAll(events: remaining)
     }
     WidgetCenter.shared.reloadAllTimelines()
+    WatchSync.pushUpcoming(events: remaining)
 }
