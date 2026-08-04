@@ -38,4 +38,22 @@ final class EventImportTests: XCTestCase {
         let url = URL(string: "sleeps://event/\(UUID().uuidString)")!
         XCTAssertThrowsError(try EventImport.payload(from: url))
     }
+
+    func testPublicShareURLRoundTrips() throws {
+        let event = CountdownEvent(title: "Camp", date: Date(), emoji: "tent", colorName: "green")
+        let payload = EventImport.makePayload(from: event)
+        let publicURL = try EventImport.publicShareURL(for: payload)
+        XCTAssertEqual(publicURL.scheme, "https")
+        XCTAssertEqual(publicURL.host, "iliarafa.github.io")
+        XCTAssertTrue(publicURL.path.hasPrefix("/sleeps/i"))
+        let decoded = try EventImport.payload(from: publicURL)
+        XCTAssertEqual(decoded.title, "Camp")
+        XCTAssertEqual(decoded.iconRaw, "tent")
+    }
+
+    func testShareMessageIncludesTitle() {
+        let event = CountdownEvent(title: "Camp", date: Date(), emoji: "tent", colorName: "green")
+        let message = EventImport.shareMessage(for: event)
+        XCTAssertTrue(message.hasPrefix("Camp — "))
+    }
 }

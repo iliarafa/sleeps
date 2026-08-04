@@ -55,7 +55,11 @@ struct EventListView: View {
             }
         }
         .onOpenURL { url in
-            if url.scheme == "sleeps", url.host() == "import" {
+            let isAppImport = url.scheme == "sleeps" && url.host() == "import"
+            let isPublicImport = url.scheme == "https"
+                && url.host() == "iliarafa.github.io"
+                && url.path().hasPrefix("/sleeps/i")
+            if isAppImport || isPublicImport {
                 do {
                     let payload = try EventImport.payload(from: url)
                     let event = EventImport.makeEvent(from: payload)

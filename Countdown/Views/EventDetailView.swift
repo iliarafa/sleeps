@@ -87,8 +87,14 @@ struct EventDetailView: View {
 
                 Spacer()
 
-                if let url = try? EventImport.url(for: EventImport.makePayload(from: event)) {
-                    ShareLink(item: url) {
+                // Share an HTTPS link (not bare sleeps://) so Messages / Mail / AirDrop
+                // show up. The landing page redirects into sleeps://import… .
+                if let url = try? EventImport.publicShareURL(for: EventImport.makePayload(from: event)) {
+                    ShareLink(
+                        item: url,
+                        subject: Text(event.title),
+                        message: Text(EventImport.shareMessage(for: event))
+                    ) {
                         Text("SHARE")
                             .font(Loud.heavy(13))
                             .foregroundStyle(Loud.ink)

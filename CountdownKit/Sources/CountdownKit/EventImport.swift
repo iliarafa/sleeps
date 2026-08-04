@@ -26,6 +26,10 @@ public enum EventImportError: Error {
 public enum EventImport {
     public static let currentVersion = 1
 
+    /// HTTPS landing page that redirects into `sleeps://import…`.
+    /// Share this (not the bare custom scheme) so Messages / Mail / AirDrop appear.
+    public static let publicShareBase = "https://iliarafa.github.io/sleeps/i/"
+
     public static func makePayload(from event: CountdownEvent) -> EventImportPayload {
         EventImportPayload(
             version: currentVersion,
@@ -37,24 +41,46 @@ public enum EventImport {
         )
     }
 
-    public static func url(for payload: EventImportPayload) throws -> URL {
+    /// Kid-facing line for share sheets that support a message body.
+    public static func shareMessage(for event: CountdownEvent) -> String {
+        "\(event.title) — \(CountdownText.sleeps(days: event.daysRemaining))"
+    }
+
+    /// Encodes the payload query value shared by deep links and the public HTTPS URL.
+    public static func encodedPayload(_ payload: EventImportPayload) throws -> String {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let data = try encoder.encode(payload)
-        let b64 = data.base64EncodedString()
+        return data.base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
+    }
+
+    /// App deep link: `sleeps://import?d=…`
+    public static func url(for payload: EventImportPayload) throws -> URL {
         var components = URLComponents()
         components.scheme = "sleeps"
         components.host = "import"
-        components.queryItems = [URLQueryItem(name: "d", value: b64)]
+        components.queryItems = [URLQueryItem(name: "d", value: try encodedPayload(payload))]
+        guard let url = components.url else { throw EventImportError.invalidURL }
+        return url
+    }
+
+    /// Public HTTPS link for the system share sheet (Messages, Mail, AirDrop, …).
+    public static func publicShareURL(for payload: EventImportPayload) throws -> URL {
+        var components = URLComponents(string: publicShareBase)!
+        components.queryItems = [URLQueryItem(name: "d", value: try encodedPayload(payload))]
         guard let url = components.url else { throw EventImportError.invalidURL }
         return url
     }
 
     public static func payload(from url: URL) throws -> EventImportPayload {
-        guard url.scheme == "sleeps", url.host == "import" else {
+        let isAppImport = url.scheme == "sleeps" && url.host == "import"
+        let isPublicImport = url.scheme == "https"
+            && url.host == "iliarafa.github.io"
+            && url.path.hasPrefix("/sleeps/i")
+        guard isAppImport || isPublicImport else {
             throw EventImportError.invalidURL
         }
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
