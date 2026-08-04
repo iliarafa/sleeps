@@ -82,6 +82,7 @@ struct EventListView: View {
             path.append(event)
         }
         .task {
+            _ = YearlyRepeat.advancePastEvents(in: modelContext)
             await NotificationScheduler.rescheduleAll(events: events)
         }
     }

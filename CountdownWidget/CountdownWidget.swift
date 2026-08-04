@@ -74,6 +74,7 @@ struct CountdownTimelineProvider: AppIntentTimelineProvider {
     @MainActor
     private func entry(for configuration: SelectEventIntent, at date: Date) async -> CountdownEntry {
         let context = ModelContext(SharedStore.shared)
+        _ = YearlyRepeat.advancePastEvents(in: context)
         var events = SharedStore.upcomingFirst(in: context).filter { !$0.isPast }
 
         if let pinnedID = configuration.event?.id {

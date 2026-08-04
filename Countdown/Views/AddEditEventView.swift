@@ -16,6 +16,7 @@ struct AddEditEventView: View {
     @State private var colorName: String
     @State private var notificationsEnabled: Bool
     @State private var hasTime: Bool
+    @State private var repeatsYearly: Bool
     @State private var showingDeleteConfirm = false
 
     init(event: CountdownEvent?, onDelete: (() -> Void)? = nil) {
@@ -27,6 +28,7 @@ struct AddEditEventView: View {
         _colorName = State(initialValue: event?.colorName ?? "blue")
         _notificationsEnabled = State(initialValue: event?.notificationsEnabled ?? true)
         _hasTime = State(initialValue: event?.hasTime ?? false)
+        _repeatsYearly = State(initialValue: event?.repeatsYearly ?? false)
     }
 
     private var canSave: Bool {
@@ -75,6 +77,15 @@ struct AddEditEventView: View {
                             .loudBox(.white, radius: 14, shadow: 4)
                         }
                     }
+
+                    Toggle(isOn: $repeatsYearly) {
+                        Text("EVERY YEAR")
+                            .font(Loud.heavy(13))
+                            .foregroundStyle(Loud.ink)
+                    }
+                    .tint(EventColor.named(colorName).color)
+                    .padding(14)
+                    .loudBox(.white, radius: 14, shadow: 4)
 
                     section("PICK A PICTURE") {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 10) {
@@ -230,10 +241,12 @@ struct AddEditEventView: View {
             event.colorName = colorName
             event.notificationsEnabled = notificationsEnabled
             event.hasTime = hasTime
+            event.repeatsYearly = repeatsYearly
         } else {
             let new = CountdownEvent(title: trimmed, date: date, emoji: icon.rawValue, colorName: colorName)
             new.notificationsEnabled = notificationsEnabled
             new.hasTime = hasTime
+            new.repeatsYearly = repeatsYearly
             modelContext.insert(new)
         }
         try? modelContext.save()

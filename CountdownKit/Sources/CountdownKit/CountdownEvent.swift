@@ -15,6 +15,7 @@ public final class CountdownEvent {
     /// Whether `date` carries a meaningful time-of-day. When false the event is
     /// treated as all-day (day-granular). Defaulted for CloudKit compatibility.
     public var hasTime: Bool = false
+    public var repeatsYearly: Bool = false
 
     public init(
         title: String = "",
