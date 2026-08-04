@@ -21,7 +21,13 @@ struct CountdownWidget: Widget {
         }
         .configurationDisplayName("Countdown")
         .description("How many sleeps until the fun stuff.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryCircular,
+            .accessoryRectangular,
+            .accessoryInline
+        ])
     }
 }
 

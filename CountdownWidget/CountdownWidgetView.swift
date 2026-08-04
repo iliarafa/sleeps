@@ -19,6 +19,12 @@ struct CountdownWidgetView: View {
             switch family {
             case .systemMedium:
                 MediumView(events: entry.events)
+            case .accessoryCircular:
+                AccessoryCircularView(event: entry.events[0])
+            case .accessoryRectangular:
+                AccessoryRectangularView(event: entry.events[0])
+            case .accessoryInline:
+                AccessoryInlineView(event: entry.events[0])
             default:
                 SmallView(event: entry.events[0])
             }
@@ -31,8 +37,19 @@ struct CountdownWidgetView: View {
             Loud.paper
         } else if family == .systemMedium {
             Rectangle().fill(.ultraThinMaterial)
+        } else if isAccessoryFamily {
+            AccessoryWidgetBackground()
         } else {
             EventColor.named(entry.events[0].colorName).color
+        }
+    }
+
+    private var isAccessoryFamily: Bool {
+        switch family {
+        case .accessoryCircular, .accessoryRectangular, .accessoryInline:
+            true
+        default:
+            false
         }
     }
 
