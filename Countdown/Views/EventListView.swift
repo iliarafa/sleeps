@@ -55,6 +55,24 @@ struct EventListView: View {
             }
         }
         .onOpenURL { url in
+            if url.scheme == "sleeps", url.host() == "import" {
+                do {
+                    let payload = try EventImport.payload(from: url)
+                    let event = EventImport.makeEvent(from: payload)
+                    modelContext.insert(event)
+                    try? modelContext.save()
+                    WidgetCenter.shared.reloadAllTimelines()
+                    Task {
+                        await NotificationScheduler.rescheduleAll(events: events + [event])
+                    }
+                    path = NavigationPath()
+                    path.append(event)
+                } catch {
+                    // Ignore malformed imports.
+                }
+                return
+            }
+
             // sleeps://event/<uuid> — used by widget taps
             guard url.scheme == "sleeps", url.host() == "event",
                   let id = UUID(uuidString: url.lastPathComponent),

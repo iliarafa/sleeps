@@ -75,6 +75,18 @@ struct EventDetailView: View {
 
                 Spacer()
 
+                if let url = try? EventImport.url(for: EventImport.makePayload(from: event)) {
+                    ShareLink(item: url) {
+                        Text("SHARE")
+                            .font(Loud.heavy(13))
+                            .foregroundStyle(Loud.ink)
+                            .padding(.horizontal, 14)
+                            .frame(height: 38)
+                            .background(Capsule().fill(Loud.paper))
+                            .overlay(Capsule().strokeBorder(Loud.ink, lineWidth: 3))
+                    }
+                }
+
                 Button {
                     showingEdit = true
                 } label: {
