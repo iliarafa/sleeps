@@ -72,7 +72,13 @@ Dev sample data: launch with the `-seedSampleData` argument (DEBUG builds only; 
 - [ ] App Store Connect: Made for Kids category (age band 6–8), privacy label "Data Not Collected"
 - [ ] Screenshots + metadata, TestFlight, submit
 
-Device-only QA still outstanding: Lock Screen widget gallery/StandBy placement, a cross-device share/import, paired WatchConnectivity and complication refresh, and Live Activity/Dynamic Island lifecycle.
+Device-only QA still outstanding:
+- Lock Screen/StandBy widget gallery visuals and `sleeps://event/<uuid>` deep links
+- Large/extra-large widget visuals on iPad
+- Cross-device share/import
+- Paired WatchConnectivity delivery and complication refresh
+- Live Activity day-boundary behavior and Lock Screen/Dynamic Island visuals
+- iPad arrival celebration layout and haptic behavior
 
 Identifiers: bundle `com.iamilias.sleeps`, App Group `group.com.iamilias.sleeps`, CloudKit container `iCloud.com.iamilias.sleeps`. Signing team is set in `project.yml`; Xcode automatic signing registers the group and container on first device build.
 
