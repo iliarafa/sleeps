@@ -4,6 +4,8 @@ import CountdownKit
 /// Hard-edged toy confetti: outlined squares and circles tumbling down,
 /// matching the Big & Loud slab style. Canvas-only, no dependencies.
 struct ConfettiView: View {
+    var particleCount: Int = 36
+
     @State private var start = Date()
 
     private static let colors: [Color] = EventColor.allCases.map(\.color) + [Loud.sun]
@@ -12,7 +14,7 @@ struct ConfettiView: View {
         TimelineView(.animation) { timeline in
             Canvas { context, size in
                 let t = timeline.date.timeIntervalSince(start)
-                for i in 0..<36 {
+                for i in 0..<particleCount {
                     var rng = SeededRandom(seed: UInt64(i))
                     let x = rng.next() * size.width
                     let speed = 60 + rng.next() * 130

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import CountdownKit
 
 struct EventDetailView: View {
@@ -7,6 +8,11 @@ struct EventDetailView: View {
     let event: CountdownEvent
 
     @State private var showingEdit = false
+    @State private var didPlayArrivalHaptic = false
+
+    private var isRegularWidth: Bool { sizeClass == .regular }
+    private var arrivalConfettiCount: Int { isRegularWidth ? 54 : 36 }
+    private var arrivalHeadlineSize: CGFloat { isRegularWidth ? 88 : 64 }
 
     private var dateSubtitle: String {
         let day = event.date.formatted(.dateTime.weekday(.wide).month(.wide).day()).uppercased()
@@ -55,7 +61,13 @@ struct EventDetailView: View {
                 .padding(.horizontal, 24)
 
                 if phase == .arrived {
-                    ConfettiView()
+                    ConfettiView(particleCount: arrivalConfettiCount)
+                        .onAppear { playArrivalHapticIfNeeded() }
+                }
+            }
+            .onChange(of: phase) { _, newPhase in
+                if newPhase != .arrived {
+                    didPlayArrivalHaptic = false
                 }
             }
         }
@@ -139,7 +151,7 @@ struct EventDetailView: View {
 
         case .arrived:
             Text(event.hasTime ? "IT'S TIME!" : "TODAY!")
-                .font(Loud.heavy(64))
+                .font(Loud.heavy(arrivalHeadlineSize))
                 .inkShadow(6)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
@@ -157,5 +169,11 @@ struct EventDetailView: View {
                 .lineLimit(1)
                 .padding(.top, 30)
         }
+    }
+
+    private func playArrivalHapticIfNeeded() {
+        guard !didPlayArrivalHaptic else { return }
+        didPlayArrivalHaptic = true
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 }
