@@ -6,8 +6,7 @@ struct AccessoryCircularView: View {
     let event: EventSnapshot
 
     var body: some View {
-        ZStack {
-            AccessoryWidgetBackground()
+        Group {
             if event.days > 0 {
                 Text("\(event.days)")
                     .font(Loud.heavy(24))

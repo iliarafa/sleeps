@@ -34,7 +34,11 @@ struct CountdownWidgetView: View {
     @ViewBuilder
     private var background: some View {
         if entry.events.isEmpty {
-            Loud.paper
+            if isAccessoryFamily {
+                AccessoryWidgetBackground()
+            } else {
+                Loud.paper
+            }
         } else if family == .systemMedium {
             Rectangle().fill(.ultraThinMaterial)
         } else if isAccessoryFamily {
@@ -53,7 +57,36 @@ struct CountdownWidgetView: View {
         }
     }
 
+    @ViewBuilder
     private var emptyView: some View {
+        if isAccessoryFamily {
+            accessoryEmptyView
+        } else {
+            homeEmptyView
+        }
+    }
+
+    @ViewBuilder
+    private var accessoryEmptyView: some View {
+        switch family {
+        case .accessoryCircular:
+            Text("+")
+                .font(Loud.heavy(16))
+        case .accessoryRectangular:
+            Text("SLEEPS")
+                .font(Loud.heavy(12))
+                .lineLimit(1)
+        case .accessoryInline:
+            Text("SLEEPS")
+                .lineLimit(1)
+        default:
+            Text("SLEEPS")
+                .font(Loud.heavy(12))
+                .lineLimit(1)
+        }
+    }
+
+    private var homeEmptyView: some View {
         VStack(spacing: 6) {
             Text("🗓️").font(.title)
             Text("ADD A COUNTDOWN!")
