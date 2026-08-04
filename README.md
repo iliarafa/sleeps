@@ -11,7 +11,11 @@ Every trip, my son asked Siri how many days were left until the fun stuff. Now t
 ## Features
 
 - **Countdowns in sleeps** — big flashcard numerals a five-year-old can read across the room
-- **Home screen widgets** — small (next event) and medium (next three), configurable to pin one; tapping opens the event via `sleeps://event/<id>` deep links
+- **Widgets everywhere** — small, medium, large, and extra-large Home Screen/iPad layouts plus circular, rectangular, and inline Lock Screen/StandBy families; taps open the local event
+- **Share a countdown** — the detail screen shares a `sleeps://import` link; opening it imports a copy with a new UUID
+- **Apple Watch glance** — read-only list/detail app plus circular, corner, inline, and rectangular complications, synced from the phone with WatchConnectivity
+- **Live Activities** — local-only Lock Screen and Dynamic Island countdowns for one sleep away and timed events in their final 24 hours
+- **Yearly repeat** — optional automatic rollover for annual events, including Feb 29 → Feb 28 in non-leap years
 - **Siri** — *"How many sleeps until Summer Camp in Sleeps?"* via App Intents
 - **Reminders** — local notifications at 7 / 3 / 1 days and the morning of, at a parent-chosen time (default 8:00 AM)
 - **iCloud sync** — SwiftData + CloudKit private database across same-account devices; gracefully falls back to local-only when iCloud isn't available
@@ -23,17 +27,19 @@ Every trip, my son asked Siri how many days were left until the fun stuff. Now t
 
 ## Stack
 
-SwiftUI · SwiftData (CloudKit) · WidgetKit · App Intents · UserNotifications · iOS 17+
+SwiftUI · SwiftData (CloudKit) · WidgetKit · ActivityKit · WatchConnectivity · App Intents · UserNotifications · iOS 17+ · watchOS 10+
 
 Tested on iOS Simulator (iPhone 17 Pro) and on a real iPhone 17 Pro Max running the iOS 27 developer beta.
 
 ## Layout
 
 ```
-CountdownKit/       Swift package: model, calendar-day math, text, notification planner, theme
+CountdownKit/       Swift package: model, date/import/repeat/activity/watch helpers, text, planner, theme
 Countdown/          App target: views, notification scheduler, Siri shortcuts
-CountdownWidget/    Widget extension (small + medium)
-Shared/             App Intents entity + widget config intent (compiled into both targets)
+CountdownWidget/    iOS widgets + Live Activity extension
+CountdownWatch/     Read-only watchOS app
+CountdownWatchWidget/  watchOS complication extension
+Shared/             App Intents + shared Live Activity attributes
 docs/               Design spec + screenshots
 project.yml         XcodeGen spec — source of truth; Countdown.xcodeproj is generated (gitignored)
 ```
@@ -49,7 +55,7 @@ xcodebuild -project Countdown.xcodeproj -scheme Countdown \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 ```
 
-Unit tests (date math across DST boundaries, kid phrasing, notification planning — 24 tests):
+Unit tests (date math across DST boundaries, import UUIDs, yearly rollover, Live Activity windows, Watch payloads, phrasing, and notification planning — 69 tests):
 
 ```sh
 cd CountdownKit && swift test
@@ -63,9 +69,10 @@ Dev sample data: launch with the `-seedSampleData` argument (DEBUG builds only; 
 
 ## Before App Store submission
 
-- [ ] Host the privacy policy and update the URL in [`SettingsView.swift`](Countdown/Views/SettingsView.swift)
 - [ ] App Store Connect: Made for Kids category (age band 6–8), privacy label "Data Not Collected"
 - [ ] Screenshots + metadata, TestFlight, submit
+
+Device-only QA still outstanding: Lock Screen widget gallery/StandBy placement, a cross-device share/import, paired WatchConnectivity and complication refresh, and Live Activity/Dynamic Island lifecycle.
 
 Identifiers: bundle `com.iamilias.sleeps`, App Group `group.com.iamilias.sleeps`, CloudKit container `iCloud.com.iamilias.sleeps`. Signing team is set in `project.yml`; Xcode automatic signing registers the group and container on first device build.
 
