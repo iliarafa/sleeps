@@ -45,6 +45,7 @@ targets:
           - CFBundleURLName: com.iamilias.sleeps
             CFBundleURLSchemes: [sleeps]
         UILaunchScreen: {}
+        NSSupportsLiveActivities: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:

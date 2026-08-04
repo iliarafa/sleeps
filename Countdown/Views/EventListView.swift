@@ -65,6 +65,7 @@ struct EventListView: View {
                     WatchSync.pushUpcoming(events: events + [event])
                     Task {
                         await NotificationScheduler.rescheduleAll(events: events + [event])
+                        await LiveActivityManager.sync(events: events + [event])
                     }
                     path = NavigationPath()
                     path.append(event)
@@ -86,6 +87,7 @@ struct EventListView: View {
             _ = YearlyRepeat.advancePastEvents(in: modelContext)
             WatchSync.pushUpcoming(events: events)
             await NotificationScheduler.rescheduleAll(events: events)
+            await LiveActivityManager.sync(events: events)
         }
     }
 

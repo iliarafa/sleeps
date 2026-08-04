@@ -257,6 +257,7 @@ struct AddEditEventView: View {
                 await NotificationScheduler.requestAuthorizationIfNeeded()
             }
             await NotificationScheduler.rescheduleAll(events: all)
+            await LiveActivityManager.sync(events: all)
         }
         WidgetCenter.shared.reloadAllTimelines()
         WatchSync.pushUpcoming(events: all)

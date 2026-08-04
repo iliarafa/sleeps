@@ -25,7 +25,22 @@ struct CountdownApp: App {
                 WidgetCenter.shared.reloadAllTimelines()
                 pushToWatch()
             }
+            if phase == .active || phase == .background {
+                syncLiveActivities()
+            }
         }
+    }
+}
+
+/// Reconciles Live Activities against the current event list. Called on every
+/// foreground/background transition so the last-sleep/ticking window is
+/// re-evaluated as days roll over, even while the app isn't in use.
+@MainActor
+private func syncLiveActivities() {
+    let context = ModelContext(SharedStore.shared)
+    let events = (try? context.fetch(FetchDescriptor<CountdownEvent>())) ?? []
+    Task {
+        await LiveActivityManager.sync(events: events)
     }
 }
 

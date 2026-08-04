@@ -10,6 +10,7 @@ func deleteEvent(_ event: CountdownEvent, modelContext: ModelContext) {
     let remaining = (try? modelContext.fetch(FetchDescriptor<CountdownEvent>())) ?? []
     Task {
         await NotificationScheduler.rescheduleAll(events: remaining)
+        await LiveActivityManager.sync(events: remaining)
     }
     WidgetCenter.shared.reloadAllTimelines()
     WatchSync.pushUpcoming(events: remaining)

@@ -7,6 +7,7 @@ import CountdownKit
 struct CountdownWidgetBundle: WidgetBundle {
     var body: some Widget {
         CountdownWidget()
+        SleepsLiveActivity()
     }
 }
 
