@@ -12,6 +12,7 @@ struct SleepsLiveActivity: Widget {
             SleepsLockScreenView(context: context)
                 .activityBackgroundTint(EventColor.named(context.state.colorName).color)
                 .activitySystemActionForegroundColor(.white)
+                .widgetURL(deepLink(for: context.attributes))
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -21,6 +22,8 @@ struct SleepsLiveActivity: Widget {
                     SleepsCountdownText(context: context)
                         .font(Loud.heavy(28))
                         .foregroundStyle(.white)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     Text(context.state.title.uppercased())
@@ -37,6 +40,8 @@ struct SleepsLiveActivity: Widget {
                 SleepsCountdownText(context: context)
                     .font(Loud.bold(14))
                     .foregroundStyle(.white)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
             } minimal: {
                 icon(for: context.state).image
                     .resizable()
@@ -93,14 +98,17 @@ private struct SleepsLockScreenView: View {
         )
         switch phase {
         case .ticking: return "TODAY"
-        default: return "ONE MORE SLEEP"
+        case .arrived: return "HOORAY! 🎉"
+        case .past: return context.state.hasTime ? "already happened" : "already passed"
+        case .sleeps: return "ONE MORE SLEEP"
         }
     }
 }
 
-/// Big numeral for "1" sleeps away, or a live native ticking clock for the
-/// final-day window — `Text(timerInterval:)` updates on-device with no
-/// re-render pushes from the app.
+/// Big numeral for "1" sleep away, a live native ticking clock for the
+/// final-day window (`Text(timerInterval:)` updates on-device with no
+/// re-render pushes from the app), or the same "TODAY!"/"IT'S TIME!"
+/// copy `EventDetailView` shows once the moment arrives.
 private struct SleepsCountdownText: View {
     let context: ActivityViewContext<SleepsActivityAttributes>
 
@@ -111,15 +119,23 @@ private struct SleepsCountdownText: View {
             now: .now
         )
         switch phase {
-        case .ticking, .sleeps(1):
+        case .ticking:
             if context.state.hasTime {
                 Text(timerInterval: Date.now...max(Date.now, context.state.eventDate), countsDown: true)
                     .monospacedDigit()
             } else {
-                Text("1")
+                arrivedText
             }
-        default:
-            Text("1")
+        case .sleeps(let days):
+            Text("\(days)")
+        case .arrived:
+            arrivedText
+        case .past(let days):
+            Text(CountdownText.headline(days: days).uppercased())
         }
+    }
+
+    private var arrivedText: Text {
+        Text(context.state.hasTime ? "IT'S TIME!" : "TODAY!")
     }
 }

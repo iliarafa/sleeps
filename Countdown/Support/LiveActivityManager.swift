@@ -44,7 +44,12 @@ enum LiveActivityManager {
                 eventDate: event.date,
                 hasTime: event.hasTime
             )
-            let content = ActivityContent(state: state, staleDate: nil)
+            // Untimed "1 more sleep" events go stale the instant the calendar
+            // rolls into the event's day — the content still says "1" but the
+            // real phase is `.arrived`. Timed/ticking events stay fresh on
+            // their own via `Text(timerInterval:)`, so they don't need one.
+            let staleDate: Date? = event.hasTime ? nil : calendar.startOfDay(for: event.date)
+            let content = ActivityContent(state: state, staleDate: staleDate)
 
             if let activity = running[event.id] {
                 // Title/color/icon live in ContentState (not ActivityAttributes),

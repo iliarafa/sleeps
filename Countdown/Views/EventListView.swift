@@ -64,6 +64,9 @@ struct EventListView: View {
                     WidgetCenter.shared.reloadAllTimelines()
                     WatchSync.pushUpcoming(events: events + [event])
                     Task {
+                        if event.notificationsEnabled {
+                            await NotificationScheduler.requestAuthorizationIfNeeded()
+                        }
                         await NotificationScheduler.rescheduleAll(events: events + [event])
                         await LiveActivityManager.sync(events: events + [event])
                     }
