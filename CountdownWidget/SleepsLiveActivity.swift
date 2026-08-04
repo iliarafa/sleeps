@@ -4,18 +4,18 @@ import SwiftUI
 import CountdownKit
 
 /// Lock Screen + Dynamic Island UI for the last-sleep / final-day ticking
-/// window. Reads only what `SleepsActivityAttributes` carries — no network,
-/// no push, no analytics.
+/// window. Reads only what `SleepsActivityAttributes`/`ContentState` carry —
+/// no network, no push, no analytics.
 struct SleepsLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: SleepsActivityAttributes.self) { context in
             SleepsLockScreenView(context: context)
-                .activityBackgroundTint(EventColor.named(context.attributes.colorName).color)
+                .activityBackgroundTint(EventColor.named(context.state.colorName).color)
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    LoudChip(icon: icon(for: context.attributes), size: 40)
+                    LoudChip(icon: icon(for: context.state), size: 40)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     SleepsCountdownText(context: context)
@@ -23,13 +23,13 @@ struct SleepsLiveActivity: Widget {
                         .foregroundStyle(.white)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text(context.attributes.title.uppercased())
+                    Text(context.state.title.uppercased())
                         .font(Loud.bold(14))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                 }
             } compactLeading: {
-                icon(for: context.attributes).image
+                icon(for: context.state).image
                     .resizable()
                     .scaledToFit()
                     .frame(width: 18, height: 18)
@@ -38,18 +38,18 @@ struct SleepsLiveActivity: Widget {
                     .font(Loud.bold(14))
                     .foregroundStyle(.white)
             } minimal: {
-                icon(for: context.attributes).image
+                icon(for: context.state).image
                     .resizable()
                     .scaledToFit()
                     .frame(width: 16, height: 16)
             }
             .widgetURL(deepLink(for: context.attributes))
-            .keylineTint(EventColor.named(context.attributes.colorName).color)
+            .keylineTint(EventColor.named(context.state.colorName).color)
         }
     }
 
-    private func icon(for attributes: SleepsActivityAttributes) -> EventIcon {
-        EventIcon.from(stored: attributes.emoji)
+    private func icon(for state: SleepsActivityAttributes.ContentState) -> EventIcon {
+        EventIcon.from(stored: state.emoji)
     }
 
     private func deepLink(for attributes: SleepsActivityAttributes) -> URL? {
@@ -62,10 +62,10 @@ private struct SleepsLockScreenView: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            LoudChip(icon: EventIcon.from(stored: context.attributes.emoji), size: 48)
+            LoudChip(icon: EventIcon.from(stored: context.state.emoji), size: 48)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(context.attributes.title.uppercased())
+                Text(context.state.title.uppercased())
                     .font(Loud.heavy(16))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

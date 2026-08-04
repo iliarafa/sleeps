@@ -37,18 +37,21 @@ enum LiveActivityManager {
         }
 
         for event in eligible {
-            let state = SleepsActivityAttributes.ContentState(eventDate: event.date, hasTime: event.hasTime)
+            let state = SleepsActivityAttributes.ContentState(
+                title: event.title,
+                colorName: event.colorName,
+                emoji: event.emoji,
+                eventDate: event.date,
+                hasTime: event.hasTime
+            )
             let content = ActivityContent(state: state, staleDate: nil)
 
             if let activity = running[event.id] {
+                // Title/color/icon live in ContentState (not ActivityAttributes),
+                // so edits to the event while the activity is running still refresh here.
                 await activity.update(content)
             } else {
-                let attributes = SleepsActivityAttributes(
-                    eventID: event.id,
-                    title: event.title,
-                    colorName: event.colorName,
-                    emoji: event.emoji
-                )
+                let attributes = SleepsActivityAttributes(eventID: event.id)
                 // Local-only: no `pushType`, so no device token is ever requested.
                 _ = try? Activity.request(attributes: attributes, content: content)
             }
