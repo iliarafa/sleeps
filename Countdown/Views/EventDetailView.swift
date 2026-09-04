@@ -9,6 +9,9 @@ struct EventDetailView: View {
 
     @State private var showingEdit = false
     @State private var didPlayArrivalHaptic = false
+    @State private var shareGate: ParentalGate?
+    @State private var pendingShare: SharePayload?
+    @State private var activeShare: SharePayload?
 
     private var isRegularWidth: Bool { sizeClass == .regular }
     private var arrivalConfettiCount: Int { isRegularWidth ? 54 : 36 }
@@ -89,12 +92,18 @@ struct EventDetailView: View {
 
                 // Share an HTTPS link (not bare sleeps://) so Messages / Mail / AirDrop
                 // show up. The landing page redirects into sleeps://import… .
+                // Kids Category: the share sheet is a door out of the app, so it
+                // opens only after the parental gate — owner decision 2026-09-04.
                 if let url = try? EventImport.publicShareURL(for: EventImport.makePayload(from: event)) {
-                    ShareLink(
-                        item: url,
-                        subject: Text(event.title),
-                        message: Text(EventImport.shareMessage(for: event))
-                    ) {
+                    Button {
+                        shareGate = ParentalGate(prompt: "To share this countdown, solve:") {
+                            pendingShare = SharePayload(
+                                url: url,
+                                subject: event.title,
+                                message: EventImport.shareMessage(for: event)
+                            )
+                        }
+                    } label: {
                         Text("SHARE")
                             .font(Loud.heavy(13))
                             .foregroundStyle(Loud.ink)
@@ -124,6 +133,20 @@ struct EventDetailView: View {
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showingEdit) {
             AddEditEventView(event: event, onDelete: { dismiss() })
+        }
+        // The share sheet is presented from onDismiss, not from the gate's
+        // onPass: a sheet set while the gate sheet is still animating out is
+        // silently dropped by SwiftUI.
+        .sheet(item: $shareGate, onDismiss: {
+            if let share = pendingShare {
+                pendingShare = nil
+                activeShare = share
+            }
+        }) { gate in
+            ParentalGateView(gate: gate)
+        }
+        .sheet(item: $activeShare) { share in
+            ShareSheet(payload: share)
         }
     }
 
@@ -181,5 +204,48 @@ struct EventDetailView: View {
         guard !didPlayArrivalHaptic else { return }
         didPlayArrivalHaptic = true
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+}
+
+struct SharePayload: Identifiable {
+    let id = UUID()
+    let url: URL
+    let subject: String
+    let message: String
+}
+
+/// ShareLink can't be presented programmatically, and SHARE must open only
+/// after the parental gate — so the gate's pass presents UIKit's sheet.
+private struct ShareSheet: UIViewControllerRepresentable {
+    let payload: SharePayload
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(
+            activityItems: [MessageWithSubject(payload: payload), payload.url],
+            applicationActivities: nil
+        )
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+
+/// Carries the share message plus a Mail subject, matching what
+/// ShareLink(item:subject:message:) used to provide.
+private final class MessageWithSubject: NSObject, UIActivityItemSource {
+    let payload: SharePayload
+    init(payload: SharePayload) { self.payload = payload }
+
+    func activityViewControllerPlaceholderItem(_ controller: UIActivityViewController) -> Any {
+        payload.message
+    }
+
+    func activityViewController(_ controller: UIActivityViewController,
+                                itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        payload.message
+    }
+
+    func activityViewController(_ controller: UIActivityViewController,
+                                subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        payload.subject
     }
 }

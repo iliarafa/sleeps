@@ -113,8 +113,8 @@ Also on `main` from planning: V2 design spec, implementation plan, ignore `.work
 ## Still open
 
 ### Owner decisions
-- Whether **SHARE** should sit behind the existing parental gate (Kids Category risk call)
-- When to push `main` / open TestFlight
+- ~~Whether **SHARE** should sit behind the existing parental gate~~ — decided 2026-09-04: **gated** (see HANDOFF)
+- When to open TestFlight (`main` is pushed)
 
 ### Before App Store / release polish
 - ~~Add **Watch app icon** assets~~ — done 2026-09-04: derived from `docs/art/app-icon.png` into `CountdownWatch/Assets.xcassets/AppIcon.appiconset` (see HANDOFF)
