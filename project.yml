@@ -124,7 +124,9 @@ targets:
       - package: CountdownKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.iamilias.sleeps.watchkitapp.complication
+        # NB: was …watchkitapp.complication; that ID is registered to another
+        # team on Apple's portal ("not available"), so it can never sign here.
+        PRODUCT_BUNDLE_IDENTIFIER: com.iamilias.sleeps.watchkitapp.widget
         INFOPLIST_KEY_CFBundleDisplayName: Sleeps
     info:
       path: CountdownWatchWidget/Info.plist

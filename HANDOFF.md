@@ -31,7 +31,7 @@ _Last verified: 2026-09-04 — 71 CountdownKit unit tests pass; watch AppIcon ad
 
 ## Facts you'll need
 
-- **Bundle IDs:** app `com.iamilias.sleeps`, widget `com.iamilias.sleeps.widget`
+- **Bundle IDs:** app `com.iamilias.sleeps`, widget `com.iamilias.sleeps.widget`, watch app `com.iamilias.sleeps.watchkitapp`, watch complication `com.iamilias.sleeps.watchkitapp.widget` — the complication was renamed from `….watchkitapp.complication` on 2026-09-04, before ever shipping: Apple's portal reports that ID "not available" (registered elsewhere), so it can never sign for this team. All four IDs are registered to team `3DLV25C9VK` with the App Group attached (verified in the minted team profiles).
 - **App Group:** `group.com.iamilias.sleeps` · **CloudKit container:** `iCloud.com.iamilias.sleeps`
 - **URL scheme:** `sleeps://event/<uuid>` opens an existing local event; `sleeps://import?d=<payload>` imports a copy with a new UUID
 - **Signing team:** `3DLV25C9VK` (set in `project.yml`)
@@ -105,6 +105,7 @@ xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
 - **The date picker is a custom calendar.** `Countdown/Views/LoudCalendar.swift` draws the month grid in the app's AvenirNext (`Loud`) fonts because the system graphical `DatePicker`/`UICalendarView` can't be re-fonted (`.font()` has no effect). Month-grid math (first-weekday offset, month length, DST) lives in the pure, unit-tested `CalendarGrid` helper in CountdownKit. Selecting a day preserves any time already on the date (`CalendarGrid.combine`), so it composes with the time feature. The `.hourAndMinute` time picker is still a system `DatePicker`.
 - **iOS 26 toolbar "Liquid Glass".** The detail screen's back + EDIT buttons live in a top `safeAreaInset` overlay (nav bar hidden), not `.toolbar`, so they float on the colored background instead of being wrapped in iOS 26's translucent capsule grouping.
 - **Simulator signing quirk:** app-group containers only register with a real "Apple Development" signature. If two "iPhone 17 Pro" simulators exist, data/containers can land on the one you're not looking at — use `xcrun simctl get_app_container <device> com.iamilias.sleeps data` to find the right one.
+- **Keychain prompt loop on CLI device builds:** each `codesign` invocation asks keychain permission for the signing key, and a device build signs many artifacts — clicking "Allow" (or Enter) grants one file, so the dialog reappears "forever", and a cancelled prompt fails that one CodeSign step with `errSecInternalComponent`. Fix: enter the login password once and click **Always Allow**; it never asks again for that key.
 
 ### Regenerating the event icons
 
@@ -199,7 +200,7 @@ The app's **Settings → For grown-ups** links Support + Privacy behind a parent
 
 All code is done; what's left is App Store Connect + assets (no code required unless noted):
 
-1. **Apple Developer portal** — on first device build, Xcode auto-registers the App Group (`group.com.iamilias.sleeps`) and CloudKit container (`iCloud.com.iamilias.sleeps`) under team `3DLV25C9VK`.
+1. ~~**Apple Developer portal**~~ **Done 2026-09-04** — `xcodebuild -allowProvisioningUpdates` registered all four bundle IDs under team `3DLV25C9VK`; every minted team profile carries `group.com.iamilias.sleeps`, and the phone profile carries the CloudKit container entitlements. (The watch complication's original bundle ID was unavailable — see "Facts you'll need".)
 2. **App Store Connect record** — create the app; set **Made for Kids** category, age band **6–8**.
 3. **Privacy** — nutrition label = **Data Not Collected**. Privacy Policy URL = `https://iliarafa.github.io/sleeps/privacy.html`.
 4. **Support URL** = `https://iliarafa.github.io/sleeps/support.html`.
