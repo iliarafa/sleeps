@@ -2,7 +2,7 @@
 
 **Sleeps** is a countdown app for kids: "How long until August?" answered in *sleeps*, on the home screen, via widgets, and via Siri. Native SwiftUI, headed for the App Store (Made for Kids). Repo: <https://github.com/iliarafa/sleeps> (public).
 
-_Last verified: 2026-08-04 — V2 source tree and project targets audited; 69 CountdownKit unit tests pass._
+_Last verified: 2026-09-04 — 71 CountdownKit unit tests pass; watch AppIcon added, project regenerated, `CountdownWatch` scheme builds and its compiled `Assets.car` + `CFBundleIconName` verified._
 
 ---
 
@@ -25,7 +25,7 @@ _Last verified: 2026-08-04 — V2 source tree and project targets audited; 69 Co
 | App icon | ✅ Done — flat "kid asleep in bed" raster, master `docs/art/app-icon.png` (replaced the generated crescent 2026-07-27; website favicon/logo synced 2026-07-28) |
 | Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> — hero cards use custom tent/party icons (not emoji); README title uses party icon |
 | Ran on real device | ✅ iPhone 17 Pro Max, iOS 27 dev beta |
-| App Store submission | ⬜ Not started — see checklist below — **⚠️ submission blocker:** `CountdownWatch` has no `AppIcon` asset catalog yet |
+| App Store submission | ⬜ Not started — see checklist below (former watch-icon submission blocker resolved 2026-09-04) |
 
 ---
 
@@ -52,7 +52,7 @@ CountdownKit/       Swift package: model, date math, import/repeat/activity/watc
   Sources/CountdownKit/            EventIcon, CountdownEvent, DaysUntil, CountdownText, CountdownPhase,
                                    CalendarGrid, NotificationPlanner, SharedStore, EventColor, LoudTheme
   Sources/CountdownKit/Resources/Icons.xcassets/   24 icon-*.imageset (@2x + @3x PNGs)
-  Tests/CountdownKitTests/         69 tests across 10 test files
+  Tests/CountdownKitTests/         71 tests across 10 test files
 Countdown/          App target: Views/, EventDeletion.swift, Support/NotificationScheduler, Intents/HowLongUntilIntent
 CountdownWidget/    iOS widget + Live Activity extension
 CountdownWatch/     Read-only watchOS app fed by the phone through WatchConnectivity
@@ -73,7 +73,7 @@ open Countdown.xcodeproj           # ⌘R to a simulator or device
 xcodebuild -project Countdown.xcodeproj -scheme Countdown \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 
-cd CountdownKit && swift test      # 69 unit tests
+cd CountdownKit && swift test      # 71 unit tests
 
 # dev sample data (DEBUG only, seeds an empty store):
 xcrun simctl launch <device> com.iamilias.sleeps -seedSampleData
@@ -204,7 +204,7 @@ All code is done; what's left is App Store Connect + assets (no code required un
 3. **Privacy** — nutrition label = **Data Not Collected**. Privacy Policy URL = `https://iliarafa.github.io/sleeps/privacy.html`.
 4. **Support URL** = `https://iliarafa.github.io/sleeps/support.html`.
 5. **Screenshots + metadata** — required sizes for iPhone (and iPad, since the app is universal / `TARGETED_DEVICE_FAMILY 1,2`).
-6. **⚠️ Watch app icon (submission blocker) — `CountdownWatch` has no `Assets.xcassets`/`AppIcon.appiconset` at all.** Unlike the phone app (`Countdown/Assets.xcassets/AppIcon.appiconset`, hand-made raster — see "Regenerating the app icon" above), no watch icon art has been made or requested. **Do not invent art for this** — get real art from the owner, then add a watchOS `AppIcon.appiconset` (single 1024² source is enough; Xcode/watchOS derives the rest) and wire it into `project.yml`'s `CountdownWatch` target. The App Store Connect archive step will fail/reject without it — resolve before archiving for submission.
+6. ~~Watch app icon (submission blocker)~~ **Resolved 2026-09-04.** `CountdownWatch/Assets.xcassets/AppIcon.appiconset` now holds a single universal 1024² `icon-1024.png` (`"platform": "watchos"`), derived from the owner's master `docs/art/app-icon.png` via `flatten-png.swift` (byte-identical to the phone icon: opaque, alpha-free). No `project.yml` edit was needed — XcodeGen's application preset sets `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` for app targets, and the target's `CountdownWatch` sources entry picks up the catalog on `xcodegen generate`. The art was verified to fit watchOS's circular mask (all art pixels within 69% of the inscribed-circle radius). To give the watch distinct art later, replace that PNG (keep it 1024², opaque) — same drill as "Regenerating the app icon" above.
 7. **Owner decision needed: SHARE parental gate.** The detail screen's `ShareLink` (share/import, `sleeps://import?d=…`) is intentionally left without a `ParentalGate` wrapper in V2 — this was a deliberate scope choice, not an oversight, but it means a kid can trigger the OS share sheet unattended. Owner should decide whether this needs gating for Kids category review before submission; don't wrap `ShareLink` without that decision.
 8. **Archive → TestFlight → submit** for review.
 

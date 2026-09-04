@@ -117,8 +117,8 @@ Also on `main` from planning: V2 design spec, implementation plan, ignore `.work
 - When to push `main` / open TestFlight
 
 ### Before App Store / release polish
-- Add **Watch app icon** assets (`CountdownWatch` has no AppIcon yet)
-- Deploy / confirm GitHub Pages serves `docs/i/` so shared HTTPS links resolve
+- ~~Add **Watch app icon** assets~~ — done 2026-09-04: derived from `docs/art/app-icon.png` into `CountdownWatch/Assets.xcassets/AppIcon.appiconset` (see HANDOFF)
+- ~~Deploy / confirm GitHub Pages serves `docs/i/`~~ — confirmed live 2026-09-04 (`https://iliarafa.github.io/sleeps/i/` returns 200)
 - Register Watch bundle IDs + App Group on the developer team if not already
 
 ### Device QA (code complete, not fully verified on hardware)
