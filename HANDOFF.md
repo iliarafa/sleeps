@@ -1,6 +1,6 @@
 # Sleeps — Handoff
 
-**Sleeps** is a countdown app for kids: "How long until August?" answered in *sleeps*, on the home screen, via widgets, and via Siri. Native SwiftUI, headed for the App Store (Made for Kids). Repo: <https://github.com/iliarafa/sleeps> (public).
+**Sleeps** is a countdown app for kids: "How long until August?" answered in *sleeps*, on the home screen, via widgets, and via Siri. Native SwiftUI. **Live on the App Store since 2026-08-04** as ["Sleeps - how many?"](https://apps.apple.com/us/app/sleeps-how-many/id6792544030) — v1.0 (pre-V2 code), category **Lifestyle** (not Kids), 4+, free. Repo: <https://github.com/iliarafa/sleeps> (public).
 
 _Last verified: 2026-09-04 — 71 CountdownKit unit tests pass; watch AppIcon added, project regenerated, `CountdownWatch` scheme builds and its compiled `Assets.car` + `CFBundleIconName` verified._
 
@@ -25,7 +25,7 @@ _Last verified: 2026-09-04 — 71 CountdownKit unit tests pass; watch AppIcon ad
 | App icon | ✅ Done — flat "kid asleep in bed" raster, master `docs/art/app-icon.png` (replaced the generated crescent 2026-07-27; website favicon/logo synced 2026-07-28) |
 | Privacy + Support website | ✅ **Live** at <https://iliarafa.github.io/sleeps/> — hero cards use custom tent/party icons (not emoji); README title uses party icon |
 | Ran on real device | ✅ iPhone 17 Pro Max, iOS 27 dev beta |
-| App Store submission | ⬜ Not started — see checklist below (former watch-icon submission blocker resolved 2026-09-04) |
+| App Store submission | 🟢 **v1.0 LIVE since 2026-08-04** ("Sleeps - how many?", id 6792544030, Lifestyle, 4+) — discovered 2026-09-04 when the 1.0 upload bounced ("train closed"); ASC record, privacy label, and screenshots already exist. V2 ships as **1.0.1 build 2** — see checklist below |
 
 ---
 
@@ -201,7 +201,7 @@ The app's **Settings → For grown-ups** links Support + Privacy behind a parent
 All code is done; what's left is App Store Connect + assets (no code required unless noted):
 
 1. ~~**Apple Developer portal**~~ **Done 2026-09-04** — `xcodebuild -allowProvisioningUpdates` registered all four bundle IDs under team `3DLV25C9VK`; every minted team profile carries `group.com.iamilias.sleeps`, and the phone profile carries the CloudKit container entitlements. (The watch complication's original bundle ID was unavailable — see "Facts you'll need".)
-2. **App Store Connect record** — create the app; set **Made for Kids** category, age band **6–8**.
+2. ~~App Store Connect record~~ — **exists; v1.0 is live** (as "Sleeps - how many?", category Lifestyle). Create a **1.0.1** version on the existing record instead. **Open owner decision:** stay Lifestyle, or move into the **Kids** category (age band 6–8) with this update — entering Kids is allowed for a live app, but it's effectively one-way (Apple restricts leaving it later). The parental gate ships either way.
 3. **Privacy** — nutrition label = **Data Not Collected**. Privacy Policy URL = `https://iliarafa.github.io/sleeps/privacy.html`.
 4. **Support URL** = `https://iliarafa.github.io/sleeps/support.html`.
 5. **Screenshots + metadata** — required sizes for iPhone (and iPad, since the app is universal / `TARGETED_DEVICE_FAMILY 1,2`).
