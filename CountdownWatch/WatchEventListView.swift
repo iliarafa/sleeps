@@ -15,11 +15,32 @@ struct WatchEventListView: View {
                     list
                 }
             }
-            .navigationTitle("SLEEPS")
+            // The ink-on-sun wordmark chip, same as the phone header and website
+            // logo — .navigationTitle would render a plain grey system title.
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { wordmark }
+            }
             .navigationDestination(for: WatchEventSnapshot.self) { event in
                 WatchEventDetailView(event: event)
             }
         }
+    }
+
+    private var wordmark: some View {
+        Text("SLEEPS")
+            .font(WatchLoud.heavy(13))
+            .kerning(0.5)
+            .foregroundStyle(Loud.ink)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(
+                Rectangle()
+                    .fill(Loud.sun)
+                    .overlay(Rectangle().strokeBorder(Loud.ink, lineWidth: 2))
+            )
+            .background(Rectangle().fill(Loud.ink).offset(x: 2.5, y: 2.5))
+            .padding(.leading, 6)  // breathing room from the curved screen edge
+            .accessibilityLabel("Sleeps")
     }
 
     private var list: some View {
