@@ -40,6 +40,11 @@ targets:
     info:
       path: Countdown/Info.plist
       properties:
+        # Version comes from MARKETING_VERSION/CURRENT_PROJECT_VERSION above —
+        # without these, XcodeGen hardcodes 1.0/1 into the plist and the build
+        # settings never reach the binary (how 1.0 shipped as "1.0 (1)").
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sleeps
         CFBundleURLTypes:
           - CFBundleURLName: com.iamilias.sleeps
@@ -79,6 +84,8 @@ targets:
     info:
       path: CountdownWidget/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sleeps Widget
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
@@ -105,6 +112,8 @@ targets:
     info:
       path: CountdownWatch/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sleeps
         WKApplication: true
         WKCompanionAppBundleIdentifier: com.iamilias.sleeps
@@ -131,6 +140,8 @@ targets:
     info:
       path: CountdownWatchWidget/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sleeps
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
